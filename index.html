@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="山笠フォーメーション">
+<title>山笠フォーメーション管理</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg-secondary:#f5f5f7;--bg-tertiary:#fbfbfd;
+  --text-primary:#1d1d1f;--text-secondary:#6e6e73;--text-tertiary:#86868b;
+  --accent:#0071e3;--accent-hover:#0077ed;
+  --success:#34c759;--warning:#ff9f0a;--danger:#ff3b30;
+  --border:rgba(0,0,0,0.08);
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg:0 8px 30px rgba(0,0,0,0.12);
+  --radius:16px;--radius-sm:10px;--radius-xs:6px;
+  --bn:#e05a2b;--bn-l:#fff0eb;--bs:#6b35c9;--bs-l:#f0eaff;
+  --line:#06c755;--pair:#e05a2b;
+}
+body{
+  font-family:-apple-system,'SF Pro Display','SF Pro Text','Helvetica Neue','Hiragino Sans',sans-serif;
+  background:var(--bg-secondary);color:var(--text-primary);
+  -webkit-font-smoothing:antialiased;font-size:14px;
+  -webkit-tap-highlight-color:transparent;
+}
+.app{max-width:560px;margin:0 auto;padding:12px 10px 50px}
+.app-header{
+  text-align:center;padding:16px 0 10px;font-size:20px;font-weight:700;
+  color:var(--text-primary);letter-spacing:-0.02em;
+  position:sticky;top:0;z-index:100;
+  background:rgba(245,245,247,0.72);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  backdrop-filter:saturate(180%) blur(20px);
+  margin:0 -10px;padding-left:10px;padding-right:10px;
+}
+.save-status{text-align:center;font-size:11px;color:var(--success);font-weight:500;margin-bottom:8px;margin-top:2px}
+.tabs{
+  display:flex;gap:4px;background:rgba(0,0,0,0.06);
+  border-radius:var(--radius-sm);padding:3px;margin-bottom:12px;
+}
+.tab{
+  flex:1;padding:8px 2px;border:none;border-radius:8px;
+  background:transparent;color:var(--text-tertiary);cursor:pointer;
+  font-size:12px;font-weight:600;transition:all 0.3s ease;
+  -webkit-appearance:none;letter-spacing:-0.01em;
+}
+.tab.active{background:var(--bg);color:var(--accent);box-shadow:var(--shadow-sm)}
+.day-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.day-tab{
+  padding:6px 14px;border:none;border-radius:980px;
+  background:rgba(0,0,0,0.04);color:var(--text-tertiary);
+  cursor:pointer;font-size:12px;font-weight:500;
+  transition:all 0.3s ease;-webkit-appearance:none;
+}
+.day-tab.active{background:rgba(52,199,89,0.12);color:var(--success);font-weight:600}
+.btn{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:8px 14px;border:none;border-radius:980px;
+  cursor:pointer;font-size:12px;font-weight:600;
+  transition:all 0.3s ease;-webkit-appearance:none;
+  letter-spacing:-0.01em;
+}
+.btn:active{transform:scale(0.97);opacity:0.85}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-ghost{background:rgba(0,0,0,0.04);color:var(--text-secondary)}
+.btn-warn{background:rgba(255,159,10,0.12);color:#cc7a00}
+.btn-danger{background:rgba(255,59,48,0.1);color:var(--danger)}
+.btn-success{background:rgba(52,199,89,0.12);color:#1a8a3e}
+.btn-save{background:var(--success);color:#fff}
+.btn-line{background:var(--line);color:#fff;font-size:13px;padding:12px 22px;border-radius:var(--radius-sm)}
+.btn-dl{background:var(--text-primary);color:#fff;font-size:13px;padding:12px 22px;border-radius:var(--radius-sm)}
+.controls{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.stat{
+  background:var(--bg);border-radius:var(--radius);
+  padding:10px 4px;text-align:center;box-shadow:var(--shadow-sm);
+}
+.stat-val{font-size:17px;font-weight:700;color:var(--text-primary);letter-spacing:-0.02em}
+.stat-label{font-size:10px;color:var(--text-tertiary);margin-top:2px;font-weight:500}
+.bokiri-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.bsum{padding:4px 10px;border-radius:980px;font-size:10px;font-weight:600}
+.bsum-none{background:rgba(0,0,0,0.04);color:var(--text-tertiary)}
+.hint-bar{
+  display:flex;gap:8px;margin-bottom:10px;padding:8px 12px;
+  background:var(--bg);border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);flex-wrap:wrap;align-items:center;
+}
+.hi{font-size:10px;color:var(--text-secondary);font-weight:500}
+.lbtn{
+  width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(0,0,0,0.1);
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;flex-shrink:0;transition:all 0.3s ease;
+  background:var(--bg);padding:0;line-height:1;-webkit-appearance:none;
+}
+.lbtn:active{transform:scale(0.88)}
+.lbtn.disabled{opacity:0.15;cursor:not-allowed;pointer-events:none}
+.lbtn-pos.on{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,113,227,0.2);transform:scale(1.1)}
+.lbtn-pair.on{background:#fff0f0;border-color:var(--danger);box-shadow:0 0 0 3px rgba(255,59,48,0.15);transform:scale(1.1)}
+.f-layout{display:flex;gap:6px;align-items:flex-start}
+.fw{
+  background:var(--bg);border-radius:var(--radius);
+  padding:8px 4px 8px 16px;box-shadow:var(--shadow-md);
+  position:relative;flex:1;min-width:0;
+}
+.dir-indicator{position:absolute;left:2px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:1px}
+.sec-head{text-align:center;font-size:11px;font-weight:700;color:var(--text-primary);letter-spacing:0.08em;padding:4px 0}
+.side-heads{display:flex;align-items:center;padding-left:10px}
+.sh2{flex:1;text-align:center;font-size:9px;font-weight:600;color:var(--text-tertiary)}
+.frow{
+  display:flex;align-items:center;gap:2px;margin-bottom:2px;
+  border-radius:var(--radius-xs);padding:1px 0;transition:background 0.3s ease;
+}
+.frow.row-n{background:var(--bn-l)}.frow.row-s{background:var(--bs-l)}
+.frow.ins-target{outline:2.5px solid var(--accent);outline-offset:1px;border-radius:6px}
+.rnum{
+  font-size:9px;font-weight:700;color:var(--text-tertiary);width:16px;text-align:center;
+  flex-shrink:0;border-radius:6px;padding:2px 0;cursor:pointer;line-height:1.4;
+  transition:all 0.2s ease;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:20px;background:rgba(0,0,0,0.03);
+}
+.rnum:active{background:rgba(0,113,227,0.1);transform:scale(0.9)}
+.rnum.ln{color:var(--accent);background:rgba(0,113,227,0.08)}
+.rnum.ins-sel{background:var(--accent);color:#fff;box-shadow:0 0 0 2px rgba(0,113,227,0.3)}
+@keyframes rnblink{0%,100%{opacity:1}50%{opacity:0.6}}
+.rnum.ins-sel{animation:rnblink 0.7s infinite}
+.gaps-col{width:24px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gap-lr{font-size:7px;font-weight:700;text-align:center}
+.gap-fb{font-size:6px;font-weight:600;color:var(--text-tertiary);text-align:center}
+.slot{
+  flex:1;min-height:36px;border:1.5px dashed rgba(0,0,0,0.1);
+  border-radius:var(--radius-xs);display:flex;align-items:center;
+  justify-content:center;cursor:pointer;padding:2px;
+  transition:all 0.2s ease;overflow:hidden;background:var(--bg-tertiary);
+}
+.slot:active{transform:scale(0.96)}
+.slot.filled{border-style:solid;border-color:rgba(0,0,0,0.06);background:var(--bg)}
+.slot.sel-from{border-color:var(--accent);border-style:solid;border-width:2.5px;background:rgba(0,113,227,0.06);box-shadow:0 0 0 3px rgba(0,113,227,0.12)}
+.slot.sel-from-pair{border-color:var(--danger);border-style:solid;border-width:2.5px;background:rgba(255,59,48,0.06);box-shadow:0 0 0 3px rgba(255,59,48,0.12)}
+.slot.sel-to-empty{border-color:var(--success);border-style:dashed;border-width:2px;background:rgba(52,199,89,0.06)}
+.slot.sel-to-filled{border-color:var(--warning);border-style:solid;border-width:2px;background:rgba(255,159,10,0.06)}
+.slot.ins-src{border-color:var(--accent);border-width:2px;border-style:solid;background:rgba(0,113,227,0.06)}
+.slot.lk-s{border-color:var(--accent);border-width:2px;border-style:solid}
+.slot.over2{border-color:var(--danger);border-width:2.5px;border-style:solid;background:rgba(255,59,48,0.06)}
+.slot.bk-n{border-color:var(--bn);border-width:2px;border-style:solid;background:var(--bn-l)}
+.slot.bk-s{border-color:var(--bs);border-width:2px;border-style:solid;background:var(--bs-l)}
+.chip{display:flex;flex-direction:column;align-items:center;width:100%}
+.cn{font-size:9px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:54px;text-align:center}
+.cd{font-size:7px;color:var(--text-tertiary);font-weight:500;text-align:center}
+.lbg{display:inline-flex;align-items:center;justify-content:center;width:10px;height:10px;border-radius:50%;font-size:6px;font-weight:800;flex-shrink:0}
+.lv1{background:#5856d6;color:#fff}.lv2{background:var(--success);color:#fff}.lv3{background:var(--warning);color:#fff}
+.ydiv{display:flex;align-items:center;margin:6px 0;gap:4px}
+.ydiv-line{flex:1;height:1.5px;background:linear-gradient(90deg,transparent,var(--text-primary),transparent)}
+.ydiv-label{
+  font-size:10px;font-weight:700;color:var(--text-primary);letter-spacing:0.1em;
+  padding:3px 10px;background:var(--bg);border:1.5px solid var(--text-primary);border-radius:980px;
+}
+.unplaced-zone{
+  width:74px;flex-shrink:0;background:var(--bg);border-radius:var(--radius);
+  padding:6px 4px;box-shadow:var(--shadow-md);display:flex;flex-direction:column;
+  align-items:center;gap:3px;max-height:82vh;overflow-y:auto;
+}
+.uz-title{font-size:9px;font-weight:600;color:var(--text-tertiary);text-align:center;margin-bottom:2px}
+.uz-chip{
+  width:66px;padding:5px 3px;border-radius:var(--radius-xs);
+  border:1.5px solid rgba(0,0,0,0.06);background:var(--bg-tertiary);
+  cursor:pointer;text-align:center;transition:all 0.2s ease;
+  display:flex;flex-direction:column;align-items:center;gap:1px;
+}
+.uz-chip:active{transform:scale(0.95)}
+.uz-chip.sel-from{border-color:var(--accent);background:rgba(0,113,227,0.06);box-shadow:0 0 0 2px rgba(0,113,227,0.15)}
+.uz-chip.sel-to{border-color:var(--warning);background:rgba(255,159,10,0.06);border-width:2px}
+.uz-name{font-size:9px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62px;display:block}
+.uz-sub{font-size:8px;color:var(--text-tertiary);font-weight:500}
+.uz-exclude{
+  width:66px;height:30px;border:1.5px dashed rgba(0,0,0,0.1);
+  border-radius:var(--radius-xs);cursor:pointer;transition:all 0.2s ease;
+  display:flex;align-items:center;justify-content:center;
+}
+.uz-exclude.active-target{border-color:var(--success);background:rgba(52,199,89,0.08);border-style:solid;border-width:2px}
+.uz-exclude span{font-size:9px;color:var(--text-tertiary);font-weight:600}
+.sel-bar{
+  border-radius:var(--radius-sm);padding:8px 14px;margin-bottom:10px;
+  font-size:12px;font-weight:600;display:flex;align-items:center;
+  gap:8px;box-shadow:var(--shadow-md);flex-wrap:wrap;
+}
+.sel-bar.mode-sel{background:var(--accent);color:#fff}
+.sel-bar.mode-pair{background:var(--danger);color:#fff}
+.sel-bar.mode-ins{background:var(--warning);color:#fff}
+.sel-bar-cancel{background:rgba(255,255,255,0.2);border:none;border-radius:980px;color:#fff;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;margin-left:auto}
+.warn-msg{
+  background:rgba(255,59,48,0.08);border:1.5px solid rgba(255,59,48,0.2);
+  border-radius:var(--radius-sm);padding:8px 14px;font-size:12px;
+  font-weight:600;color:var(--danger);margin-bottom:10px;
+}
+.scard{
+  background:var(--bg);border-radius:var(--radius);
+  padding:16px;margin-bottom:10px;box-shadow:var(--shadow-sm);
+}
+.scard-title{font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:10px;letter-spacing:-0.01em}
+.step-box{background:var(--bg-secondary);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px}
+.step{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}.step:last-child{margin-bottom:0}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-text{font-size:12px;color:var(--text-secondary);font-weight:500;line-height:1.5}.step-text b{color:var(--text-primary);font-weight:700}
+.mchip{
+  display:flex;align-items:center;gap:8px;padding:10px 12px;
+  border-radius:var(--radius-sm);background:var(--bg);
+  cursor:pointer;margin-bottom:6px;box-shadow:var(--shadow-sm);
+  transition:all 0.3s ease;border:1.5px solid transparent;
+}
+.mchip.in-pool{border-color:rgba(52,199,89,0.3);background:rgba(52,199,89,0.04)}
+.mname{font-size:14px;font-weight:600;color:var(--text-primary);flex:1;letter-spacing:-0.01em}
+.msub{font-size:12px;color:var(--text-tertiary);font-weight:400}
+.role-pill{
+  font-size:10px;padding:4px 10px;border-radius:980px;font-weight:600;
+  cursor:pointer;border:none;flex-shrink:0;-webkit-appearance:none;
+  transition:all 0.2s ease;
+}
+.rp-free{background:rgba(0,0,0,0.04);color:var(--text-tertiary)}
+.rp-omote{background:rgba(0,113,227,0.1);color:var(--accent)}
+.rp-okuri{background:rgba(224,90,43,0.1);color:var(--pair)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.form-field{display:flex;flex-direction:column;gap:4px}.form-field.full{grid-column:1/-1}
+.form-label{font-size:12px;font-weight:600;color:var(--text-secondary)}
+.form-input{
+  padding:10px 12px;border:1.5px solid rgba(0,0,0,0.1);
+  border-radius:var(--radius-xs);font-size:15px;color:var(--text-primary);
+  background:var(--bg);width:100%;-webkit-appearance:none;
+  transition:all 0.3s ease;
+}
+.form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(0,113,227,0.1)}
+.form-select{
+  padding:10px 12px;border:1.5px solid rgba(0,0,0,0.1);
+  border-radius:var(--radius-xs);font-size:15px;color:var(--text-primary);
+  background:var(--bg);width:100%;
+}
+.day-checks{display:flex;gap:8px;flex-wrap:wrap}
+.day-check{
+  display:flex;align-items:center;gap:5px;font-size:13px;font-weight:500;
+  color:var(--text-secondary);cursor:pointer;padding:6px 10px;
+  background:rgba(0,0,0,0.03);border-radius:var(--radius-xs);
+}
+.day-check input{width:16px;height:16px;cursor:pointer;accent-color:var(--accent)}
+.url-input{
+  width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.1);
+  border-radius:var(--radius-xs);font-size:13px;color:var(--text-primary);
+  background:var(--bg);margin-bottom:8px;-webkit-appearance:none;
+  transition:all 0.3s ease;
+}
+.url-input:focus{outline:none;border-color:var(--accent)}
+.tag-new{font-size:9px;padding:2px 6px;border-radius:980px;background:rgba(52,199,89,0.1);color:#1a8a3e;font-weight:600;margin-left:4px}
+.score-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.score-label{font-size:13px;color:var(--text-secondary);width:80px;flex-shrink:0;font-weight:500}
+.score-val{font-size:14px;font-weight:700;color:var(--accent);width:24px;text-align:right}
+input[type=range]{flex:1;accent-color:var(--accent);height:4px}
+.filter-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.filter-label{font-size:12px;color:var(--text-secondary);width:60px;flex-shrink:0;font-weight:500}
+input[type=number]{
+  width:56px;padding:6px 8px;border:1.5px solid rgba(0,0,0,0.1);
+  border-radius:var(--radius-xs);font-size:13px;color:var(--text-primary);
+  background:var(--bg);font-weight:500;
+}
+.share-wrap{background:var(--bg);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-md)}
+.share-actions{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+#shareRender{background:#fff;padding:14px 12px 12px;font-family:-apple-system,'Hiragino Sans',sans-serif;width:600px;position:fixed;left:-9999px;top:0;z-index:-1}
+.sr-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #e0e0e8}
+.sr-title{font-size:15px;font-weight:800;color:#1d1d1f}.sr-dir{font-size:11px;font-weight:700;color:var(--accent)}
+.sr-legend{display:flex;gap:14px;margin-bottom:8px}
+.sr-leg{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-tertiary);font-weight:500}
+.sr-ldot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.sr-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sr-sec{flex:1}
+.sr-sec-title{text-align:center;font-size:11px;font-weight:800;letter-spacing:0.12em;color:#1d1d1f;margin-bottom:4px;padding:3px 0;border-bottom:1.5px solid #e0e0e8}
+.sr-yamagasa{text-align:center;font-size:12px;font-weight:800;color:#1d1d1f;padding:5px 0;margin:4px 0;border-top:2px solid #1d1d1f;border-bottom:2px solid #1d1d1f;letter-spacing:0.18em}
+.sr-row{display:flex;align-items:center;gap:4px;margin-bottom:3px}
+.sr-num{width:16px;text-align:center;font-size:10px;font-weight:700;color:var(--text-tertiary);flex-shrink:0}
+.sr-cell{flex:1;padding:3px 5px;border-radius:4px;background:#f5f5f7;font-size:11px;font-weight:700;color:#1d1d1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr-cell.bn{background:#fff0eb;border:1px solid #e05a2b;color:#c04010}
+.sr-cell.bs{background:#f0eaff;border:1px solid #6b35c9;color:#5b21b6}
+.sr-sheads{display:flex;padding-left:20px;margin-bottom:2px}
+.sr-sh{flex:1;text-align:center;font-size:9px;font-weight:600;color:rgba(0,0,0,0.2)}
+#shareCanvas{display:none;position:fixed;left:-9999px}
+.toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+  background:var(--text-primary);color:#fff;
+  padding:10px 24px;border-radius:980px;font-size:13px;font-weight:600;
+  z-index:9999;pointer-events:none;opacity:0;
+  transition:opacity 0.3s ease;white-space:nowrap;
+  box-shadow:var(--shadow-lg);
+}
+.toast.show{opacity:1}
+.reset-area{
+  background:rgba(255,59,48,0.06);border:1.5px solid rgba(255,59,48,0.15);
+  border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;
+}
+.reset-area-title{font-size:12px;font-weight:700;color:var(--danger);margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="app-header">山笠フォーメーション管理</div>
+  <div class="save-status" id="saveStatus"></div>
+  <div class="tabs">
+    <div class="tab active" id="tab-f" onclick="switchTab('f')">フォーメーション</div>
+    <div class="tab" id="tab-m" onclick="switchTab('m')">メンバー</div>
+    <div class="tab" id="tab-sh" onclick="switchTab('sh')">配布用</div>
+    <div class="tab" id="tab-s" onclick="switchTab('s')">設定</div>
+  </div>
+  <div class="day-tabs">
+    <div class="day-tab active" id="day-0" onclick="switchDay(0)">4/26 お汐井取り</div>
+    <div class="day-tab" id="day-1" onclick="switchDay(1)">5/9 本番1日目</div>
+    <div class="day-tab" id="day-2" onclick="switchDay(2)">5/10 本番2日目</div>
+  </div>
+  <div id="main"></div>
+  <canvas id="shareCanvas" style="display:none;position:fixed;left:-9999px"></canvas>
+</div>
+<div class="toast" id="toast"></div>
+<div id="shareRender" style="display:none;visibility:hidden;position:fixed;left:-9999px;top:0;width:600px;background:#fff;padding:14px 12px;font-family:-apple-system,'Hiragino Sans',sans-serif;font-size:14px;z-index:-1"></div>
+<script>
+const MAX=13;
+const DAY_LABELS=['4/26 お汐井取り 13:00〜','5/9 本番1日目 16:00〜','5/10 本番2日目 15:00〜'];
+const SAVE_KEY='yamakasa_v2';
+
+let nextId=1,members=[],pool=new Set();
+let pl={ol:{},or:{},kl:{},kr:{}};
+let lkPos={ol:new Set(),or:new Set(),kl:new Set(),kr:new Set()};
+let lkPair={o:new Set(),k:new Set()};
+let scores={height:10,level:4,age:2};
+let filters={hoMax:999,hoMin:0,hkMax:999,hkMin:0,aoMax:999,aoMin:0,akMax:999,akMin:0};
+let sheetUrl='',cTab='f',cDay=0,showForm=false;
+let mode='normal',sel=null,ins=null;
+let saveTimer=null;
+
+// ===== 保存・読み込み =====
+function saveData(manual){
+  try{
+    const data={nextId,members,pool:[...pool],
+      pl:{ol:obj2arr(pl.ol),or:obj2arr(pl.or),kl:obj2arr(pl.kl),kr:obj2arr(pl.kr)},
+      lkPos:{ol:[...lkPos.ol],or:[...lkPos.or],kl:[...lkPos.kl],kr:[...lkPos.kr]},
+      lkPair:{o:[...lkPair.o],k:[...lkPair.k]},
+      scores,filters,sheetUrl,cDay};
+    localStorage.setItem(SAVE_KEY,JSON.stringify(data));
+    const st=document.getElementById('saveStatus');
+    if(st)st.textContent='保存済 — '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+    if(manual)showToast('保存しました');
+  }catch(e){if(manual)showToast('保存失敗');}
+}
+function obj2arr(o){const r={};Object.entries(o).forEach(([k,v])=>{if(v)r[parseInt(k)]=v;});return r;}
+function autoSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>saveData(false),800);}
+
+function loadData(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);if(!raw)return false;
+    const d=JSON.parse(raw);
+    nextId=d.nextId||1;members=d.members||[];pool=new Set(d.pool||[]);
+    pl={ol:d.pl?.ol||{},or:d.pl?.or||{},kl:d.pl?.kl||{},kr:d.pl?.kr||{}};
+    ['ol','or','kl','kr'].forEach(s=>{const f={};Object.entries(pl[s]).forEach(([k,v])=>{if(v)f[parseInt(k)]=v;});pl[s]=f;});
+    lkPos={ol:new Set(d.lkPos?.ol||[]),or:new Set(d.lkPos?.or||[]),kl:new Set(d.lkPos?.kl||[]),kr:new Set(d.lkPos?.kr||[])};
+    lkPair={o:new Set(d.lkPair?.o||[]),k:new Set(d.lkPair?.k||[])};
+    scores=d.scores||{height:10,level:4,age:2};
+    filters=d.filters||{hoMax:999,hoMin:0,hkMax:999,hkMin:0,aoMax:999,aoMin:0,akMax:999,akMin:0};
+    if(filters.hoMax<999&&filters.hoMax<=175&&filters.hkMin>=165){
+      filters={hoMax:999,hoMin:0,hkMax:999,hkMin:0,aoMax:999,aoMin:0,akMax:999,akMin:0};
+    }
+    sheetUrl=d.sheetUrl||'';cDay=d.cDay||0;
+    return true;
+  }catch(e){return false;}
+}
+
+function showToast(msg,ms){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),ms||2200);
+}
+
+// ===== ユーティリティ =====
+function byId(id){return members.find(m=>m.id===id)}
+function getDay(d){return members.filter(m=>m.days[d]===1)}
+function allPlaced(){const s=new Set();Object.values(pl).forEach(p=>Object.values(p).forEach(id=>{if(id)s.add(id)}));return s}
+function pairDiff(sec,n){const l=pl[sec+'l'][n],r=pl[sec+'r'][n];if(!l||!r)return null;const ml=byId(l),mr=byId(r);if(!ml||!mr)return null;return Math.abs(ml.height-mr.height)}
+function prevDiff(side,n){if(n<=1)return null;const c=pl[side][n],p=pl[side][n-1];if(!c||!p)return null;const mc=byId(c),mp=byId(p);if(!mc||!mp)return null;return mp.height-mc.height;}
+function sn(n){if(!n)return'';const s=n.replace(/[\s\u3000]/g,'');return s.length>5?s.slice(0,5)+'…':s}
+function hasM(sec,num){return !!(pl[sec+'l'][num]||pl[sec+'r'][num])}
+function isOver2(sec){
+  const h1l=pl[sec+'l'][1]?byId(pl[sec+'l'][1])?.height:null,h1r=pl[sec+'r'][1]?byId(pl[sec+'r'][1])?.height:null;
+  const h2l=pl[sec+'l'][2]?byId(pl[sec+'l'][2])?.height:null,h2r=pl[sec+'r'][2]?byId(pl[sec+'r'][2])?.height:null;
+  if(h1l&&h2l&&h2l-h1l>2)return true;if(h1r&&h2r&&h2r-h1r>2)return true;return false;
+}
+function calcBokiri(sec){
+  const lp=Object.keys(pl[sec+'l']).filter(n=>pl[sec+'l'][n]).map(Number);
+  const rp=Object.keys(pl[sec+'r']).filter(n=>pl[sec+'r'][n]).map(Number);
+  const N=Math.max(lp.length?Math.max(...lp):0,rp.length?Math.max(...rp):0);
+  if(N<6)return{normal:null,sw:null,N};
+  const H=Math.ceil(N/2),even=N%2===0;
+  return sec==='o'?{normal:H+1,sw:even?H:H-1,N}:{normal:even?H:H-1,sw:H+1,N};
+}
+function chipHTML(m){
+  if(!m)return'';
+  return`<div class="chip"><div style="display:flex;align-items:center;gap:1px"><span class="lbg lv${m.level}">${m.level}</span><span class="cn">${sn(m.name)}</span></div><span class="cd">${m.height}・${m.age}歳</span></div>`;
+}
+let oBk,kBk;
+function getBk(sec,num){const bk=sec==='o'?oBk:kBk;if(!bk||bk.N<6)return'';if(bk.normal===num)return'n';if(bk.sw===num)return's';return'';}
+function otherSide(side){return side.endsWith('l')?side.slice(0,-1)+'r':side.slice(0,-1)+'l';}
+function isPairLocked(side,num){return lkPair[side.startsWith('o')?'o':'k'].has(num);}
+
+// ===== フォーメーション操作 =====
+function compactSec(sec,n){const lk=sec+'l',rk=sec+'r';for(let i=n;i<MAX;i++){pl[lk][i]=pl[lk][i+1]||null;pl[rk][i]=pl[rk][i+1]||null;}pl[lk][MAX]=null;pl[rk][MAX]=null;}
+function doInsert(tS,tN,sS,sN){
+  const tl=tS+'l',tr=tS+'r',sl=sS+'l',sr=sS+'r';
+  const iL=pl[sl][sN],iR=pl[sr][sN];if(!iL&&!iR)return;
+  if(sS===tS){
+    pl[sl][sN]=null;pl[sr][sN]=null;compactSec(sS,sN);
+    const adj=sN<tN?tN-1:tN;
+    for(let i=MAX;i>=adj;i--){if(i+1<=MAX){pl[tl][i+1]=pl[tl][i]||null;pl[tr][i+1]=pl[tr][i]||null;}}
+    pl[tl][adj]=iL||null;pl[tr][adj]=iR||null;
+  }else{
+    pl[sl][sN]=null;pl[sr][sN]=null;compactSec(sS,sN);
+    for(let i=MAX;i>=tN;i--){if(i+1<=MAX){pl[tl][i+1]=pl[tl][i]||null;pl[tr][i+1]=pl[tr][i]||null;}}
+    pl[tl][tN]=iL||null;pl[tr][tN]=iR||null;
+  }
+}
+function clickNum(sec,num){if(mode==='ins'&&ins.sec===sec&&ins.num===num){mode='normal';ins=null;render();return;}mode='ins';ins={sec,num};sel=null;render();}
+function clickSlot(side,num){
+  const sec=side.startsWith('o')?'o':'k';
+  if(mode==='ins'){doInsert(ins.sec,ins.num,sec,num);mode='normal';ins=null;sel=null;autoSave();render();return;}
+  if(mode==='normal'){if(isPairLocked(side,num)){sel={type:'slot',side,num};mode='pair';render();return;}sel={type:'slot',side,num};mode='sel';render();return;}
+  if(mode==='sel'){
+    if(sel.type==='slot'&&sel.side===side&&sel.num===num){mode='normal';sel=null;render();return;}
+    if(sel.type==='slot'){const fId=pl[sel.side][sel.num],tId=pl[side][num];pl[sel.side][sel.num]=tId||null;pl[side][num]=fId||null;}
+    else if(sel.type==='unplaced'){pl[side][num]=sel.id;}
+    mode='normal';sel=null;autoSave();render();return;
+  }
+  if(mode==='pair'){
+    if(sel.type==='slot'&&sel.side===side&&sel.num===num){mode='normal';sel=null;render();return;}
+    const fS=sel.side.startsWith('o')?'o':'k',fN=sel.num;
+    const fL=pl[fS+'l'][fN],fR=pl[fS+'r'][fN],tL=pl[sec+'l'][num],tR=pl[sec+'r'][num];
+    pl[fS+'l'][fN]=tL||null;pl[fS+'r'][fN]=tR||null;pl[sec+'l'][num]=fL||null;pl[sec+'r'][num]=fR||null;
+    mode='normal';sel=null;autoSave();render();return;
+  }
+}
+function clickUnplaced(id){
+  if(mode==='ins'){mode='normal';ins=null;render();return;}
+  if(mode==='normal'){sel={type:'unplaced',id};mode='sel';render();return;}
+  if(mode==='pair'){sel={type:'unplaced',id};mode='sel';render();return;}
+  if(mode==='sel'){
+    if(sel.type==='unplaced'&&sel.id===id){mode='normal';sel=null;render();return;}
+    if(sel.type==='slot'){pl[sel.side][sel.num]=id;}
+    mode='normal';sel=null;autoSave();render();return;
+  }
+}
+function clickExclude(){
+  if(mode==='sel'&&sel?.type==='slot'){pl[sel.side][sel.num]=null;mode='normal';sel=null;autoSave();render();}
+  else if(mode==='pair'&&sel?.type==='slot'){const sec=sel.side.startsWith('o')?'o':'k';pl[sec+'l'][sel.num]=null;pl[sec+'r'][sel.num]=null;mode='normal';sel=null;autoSave();render();}
+}
+function cancelSel(){mode='normal';sel=null;ins=null;render();}
+function toggleLkPos(sec,num){const l=lkPos[sec+'l'],r=lkPos[sec+'r'];if(l.has(num)){l.delete(num);r.delete(num);}else{l.add(num);r.add(num);}autoSave();render();}
+function toggleLkPair(sec,num){if(!hasM(sec,num))return;if(lkPair[sec].has(num))lkPair[sec].delete(num);else lkPair[sec].add(num);autoSave();render();}
+
+function slotEl(side,num,bk){
+  const mid=pl[side][num],m=mid?byId(mid):null;
+  const sec=side.startsWith('o')?'o':'k';
+  let cls='slot';
+  const isSF=sel&&sel.type==='slot'&&sel.side===side&&sel.num===num;
+  const isPF=mode==='pair'&&sel&&sel.num===num&&(side.startsWith('o')?'o':'k')===(sel.side.startsWith('o')?'o':'k');
+  if(isPF)cls+=' sel-from-pair'+(m?' filled':'');
+  else if(isSF)cls+=' sel-from'+(m?' filled':'');
+  else if(mode==='sel'||mode==='pair')cls+=m?' sel-to-filled':' sel-to-empty';
+  else if(mode==='ins')cls+=' ins-src'+(m?' filled':'');
+  else{
+    if(num===2&&isOver2(sec))cls+=' over2'+(m?' filled':'');
+    else if(bk==='n')cls+=' bk-n'+(m?' filled':'');
+    else if(bk==='s')cls+=' bk-s'+(m?' filled':'');
+    else{if(m)cls+=' filled';if(lkPos[side].has(num))cls+=' lk-s';}
+  }
+  return`<div class="${cls}" onclick="clickSlot('${side}',${num})">${chipHTML(m)}</div>`;
+}
+
+// ===== フォーメーションタブ =====
+function renderF(){
+  oBk=calcBokiri('o');kBk=calcBokiri('k');
+  const dayM=getDay(cDay),placed=allPlaced();
+  const poolArr=[...pool].map(id=>byId(id)).filter(Boolean);
+  const unplaced=poolArr.filter(m=>!placed.has(m.id)&&m.days[cDay]===1).sort((a,b)=>b.height-a.height);
+  let ps=[];['o','k'].forEach(s=>{for(let i=1;i<=MAX;i++){const d=pairDiff(s,i);if(d!=null)ps.push(d);}});
+  const avg=ps.length?Math.round(ps.reduce((a,b)=>a+b,0)/ps.length):null;
+  const oc=Object.values(pl.ol).filter(Boolean).length+Object.values(pl.or).filter(Boolean).length;
+  const kc=Object.values(pl.kl).filter(Boolean).length+Object.values(pl.kr).filter(Boolean).length;
+  const over2w=[];['o','k'].forEach(s=>{if(isOver2(s))over2w.push(s==='o'?'おもて':'おくり');});
+  let h=`<div class="stats-row">
+    <div class="stat"><div class="stat-val">${dayM.length}</div><div class="stat-label">参加</div></div>
+    <div class="stat"><div class="stat-val">${pool.size}</div><div class="stat-label">配置対象</div></div>
+    <div class="stat"><div class="stat-val">${oc}/${kc}</div><div class="stat-label">表/送り</div></div>
+    <div class="stat"><div class="stat-val">${avg!=null?avg+'cm':'\u2014'}</div><div class="stat-label">平均ペア差</div></div>
+  </div>`;
+  if(over2w.length)h+=`<div class="warn-msg">${over2w.join('・')}：2番が1番より+2cm超え</div>`;
+  if(mode==='sel'){
+    const m2=sel.type==='slot'?byId(pl[sel.side][sel.num]):byId(sel.id);
+    h+=`<div class="sel-bar mode-sel">${sel.type==='slot'?`${m2?sn(m2.name):'空欄'}（${sel.num}番）→ 移動先タップ`:`${sn(m2?.name||'')} → 配置先スロットをタップ`}<button class="sel-bar-cancel" onclick="cancelSel()">×</button></div>`;
+  }else if(mode==='pair'){
+    const m2=byId(pl[sel.side][sel.num]),pt=byId(pl[otherSide(sel.side)][sel.num]);
+    h+=`<div class="sel-bar mode-pair">ペア：${m2?sn(m2.name):''}＋${pt?sn(pt.name):''} → 移動先番号タップ<button class="sel-bar-cancel" onclick="cancelSel()">×</button></div>`;
+  }else if(mode==='ins'){
+    h+=`<div class="sel-bar mode-ins">${ins.sec==='o'?'おもて':'おくり'} ${ins.num}番に挿入 → 元スロットをタップ<button class="sel-bar-cancel" onclick="cancelSel()">×</button></div>`;
+  }
+  h+=`<div class="controls">
+    <button class="btn btn-primary" onclick="autoPlace()">自動入力</button>
+    <button class="btn btn-save" onclick="saveData(true)">保存</button>
+    <button class="btn btn-warn" onclick="clearExLocked()">固定以外クリア</button>
+    <button class="btn btn-ghost" onclick="clearAll()">全クリア</button>
+  </div>
+  <div class="hint-bar">
+    <div class="hi">スロットタップ → 選択 → 別スロットで移動</div>
+    <div class="hi">ペア固定中はペアごと移動</div>
+    <div class="hi">番号タップ → 挿入</div>
+  </div>
+  <div class="bokiri-bar">`;
+  ['o','k'].forEach(sec=>{
+    const bk=sec==='o'?oBk:kBk,lb=sec==='o'?'おもて':'おくり';
+    if(bk.N<6)h+=`<div class="bsum bsum-none">${lb}：棒切りなし（${bk.N}人）</div>`;
+    else h+=`<div class="bsum" style="background:var(--bn-l);color:var(--bn)">${lb} 棒切り→${bk.normal}番</div><div class="bsum" style="background:var(--bs-l);color:var(--bs)">${lb} スイッチバック後→${bk.sw}番</div>`;
+  });
+  h+=`</div><div class="f-layout"><div class="fw">
+    <div class="dir-indicator"><span style="font-size:12px;color:var(--accent);line-height:1">↑</span><span style="writing-mode:vertical-rl;font-size:7px;font-weight:700;color:var(--accent);letter-spacing:0.08em">進行方向</span></div>
+    <div class="sec-head">おもて</div>
+    <div class="side-heads" style="padding-left:10px"><div style="width:16px;flex-shrink:0"></div><div style="width:22px;flex-shrink:0"></div><div class="sh2">左</div><div style="width:25px;flex-shrink:0"></div><div class="sh2">右</div><div style="width:14px;flex-shrink:0"></div></div>`;
+  function buildRows(sec,nums){
+    let out='';
+    for(const i of nums){
+      const lrD=pairDiff(sec,i),lDiff=i>1?prevDiff(sec+'l',i):null,rDiff=i>1?prevDiff(sec+'r',i):null;
+      const fbAvg=(lDiff!=null&&rDiff!=null)?Math.round((lDiff+rDiff)/2):(lDiff!=null?lDiff:rDiff);
+      const lrColor=lrD==null?'':lrD===0?'var(--success)':lrD<=2?'var(--warning)':'var(--pair)';
+      const fbColor=fbAvg==null?'':fbAvg>=0?'var(--text-tertiary)':'var(--danger)';
+      const bk=getBk(sec,i),rowCls=bk==='n'?'row-n':bk==='s'?'row-s':'';
+      const posOn=lkPos[sec+'l'].has(i)&&lkPos[sec+'r'].has(i),pairOn=lkPair[sec].has(i);
+      const isIS=mode==='ins'&&ins.sec===sec&&ins.num===i;
+      out+=`<div class="frow ${rowCls}${isIS?' ins-target':''}">
+        <div class="rnum${posOn?' ln':''}${isIS?' ins-sel':''}" onclick="clickNum('${sec}',${i})" style="width:16px">${i}</div>
+        <button class="lbtn lbtn-pos ${posOn?'on':''}" onclick="toggleLkPos('${sec}',${i})">${posOn?'🔒':'🔓'}</button>
+        ${slotEl(sec+'l',i,bk)}
+        <div class="gaps-col"><div class="gap-lr" style="color:${lrColor}">${lrD!=null?'±'+lrD:''}</div><div class="gap-fb" style="color:${fbColor}">${fbAvg!=null?(fbAvg>=0?'↓'+fbAvg:'↑'+Math.abs(fbAvg))+'cm':''}</div></div>
+        <button class="lbtn lbtn-pair ${pairOn?'on':''} ${!hasM(sec,i)?'disabled':''}" onclick="toggleLkPair('${sec}',${i})">${pairOn?'❤️':'🤍'}</button>
+        ${slotEl(sec+'r',i,bk)}
+        <div style="width:14px;flex-shrink:0"></div>
+      </div>`;
+    }
+    return out;
+  }
+  h+=buildRows('o',Array.from({length:MAX},(_,i)=>i+1));
+  h+=`<div class="ydiv"><div class="ydiv-line"></div><div class="ydiv-label">山　笠</div><div class="ydiv-line"></div></div>`;
+  h+=buildRows('k',Array.from({length:MAX},(_,i)=>MAX-i));
+  h+=`<div class="side-heads" style="padding-left:10px;margin-top:2px"><div style="width:16px;flex-shrink:0"></div><div style="width:22px;flex-shrink:0"></div><div class="sh2">左</div><div style="width:25px;flex-shrink:0"></div><div class="sh2">右</div><div style="width:14px;flex-shrink:0"></div></div>
+  <div class="sec-head">おくり</div></div>`;
+  const sIS=mode==='sel'&&sel?.type==='slot',sIP=mode==='pair'&&sel?.type==='slot',sIU=mode==='sel'&&sel?.type==='unplaced';
+  h+=`<div class="unplaced-zone"><div class="uz-title">未配置<br>${unplaced.length}人</div>
+    <div class="uz-exclude ${(sIS||sIP)?'active-target':''}" onclick="clickExclude()"><span>${(sIS||sIP)?'→除外':'除外'}</span></div>`;
+  unplaced.forEach(m=>{
+    const isF=sIU&&sel.id===m.id,isT=(mode==='sel'||mode==='pair')&&!isF;
+    h+=`<div class="uz-chip ${isF?'sel-from':isT?'sel-to':''}" onclick="clickUnplaced(${m.id})"><div style="display:flex;align-items:center;gap:2px"><span class="lbg lv${m.level}">${m.level}</span><span class="uz-name">${sn(m.name)}</span></div><span class="uz-sub">${m.height}cm</span></div>`;
+  });
+  if(!unplaced.length)h+=`<div style="font-size:10px;color:var(--success);font-weight:600;text-align:center;padding:4px">全員配置済</div>`;
+  h+=`</div></div>`;
+  const otherDay=members.filter(m=>!m.days[cDay]);
+  if(otherDay.length>0){
+    h+=`<div class="scard" style="opacity:0.55"><div class="scard-title">この日は不参加（${otherDay.length}人）</div>`;
+    otherDay.forEach(m=>{
+      const dp=[m.days[0]?'4/26':'',m.days[1]?'5/9':'',m.days[2]?'5/10':''].filter(Boolean).join('・');
+      h+=`<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:var(--radius-xs);margin-bottom:3px;background:var(--bg-secondary)"><span class="lbg lv${m.level}">${m.level===1?'初':m.level===2?'中':'上'}</span><div style="flex:1;font-size:12px;color:var(--text-secondary)">${m.name}</div><div style="font-size:10px;color:var(--text-tertiary)">${dp||'未設定'}</div></div>`;
+    });
+    h+=`</div>`;
+  }
+  document.getElementById('main').innerHTML=h;
+}
+
+// ===== 配布用 =====
+function sname(m){return m?m.name.replace(/[\s\u3000]/g,''):''}
+function buildShareHTML(){
+  const ob=calcBokiri('o'),kb=calcBokiri('k');
+  function bkC(sec,num){const bk=sec==='o'?ob:kb;if(bk.N<6)return'';if(bk.normal===num)return'bn';if(bk.sw===num)return'bs';return'';}
+  function getR(sec,rev){const rows=[];for(let i=1;i<=MAX;i++){const l=pl[sec+'l'][i],r=pl[sec+'r'][i];if(l||r)rows.push([i,l?byId(l):null,r?byId(r):null]);}return rev?rows.reverse():rows;}
+  function cT(m){return m?`${sname(m)}（${m.age}）`:'';}
+  function rH(rows,sec){return rows.map(([n,l,r])=>`<div class="sr-row"><div class="sr-num">${n}</div><div class="sr-cell ${bkC(sec,n)}">${cT(l)}</div><div class="sr-cell ${bkC(sec,n)}">${cT(r)}</div></div>`).join('');}
+  const oR=getR('o',false),kR=getR('k',true);
+  const obT=ob.N>=6?`棒切り→${ob.normal}番 / SW後→${ob.sw}番`:'棒切りなし';
+  const kbT=kb.N>=6?`棒切り→${kb.normal}番 / SW後→${kb.sw}番`:'棒切りなし';
+  return{oR,kR,obT,kbT,html:`<div class="sr-header"><div class="sr-title">🎋 ${DAY_LABELS[cDay]}</div><div class="sr-dir">↑ 進行方向</div></div>
+<div class="sr-legend"><div class="sr-leg"><div class="sr-ldot" style="background:#e05a2b"></div>棒切り</div><div class="sr-leg"><div class="sr-ldot" style="background:#6b35c9"></div>SW後棒切り</div></div>
+<div class="sr-cols"><div class="sr-sec"><div class="sr-sec-title">↑ おもて</div><div class="sr-sheads"><div class="sr-sh">左</div><div class="sr-sh">右</div></div>
+${rH(oR,'o')}<div class="sr-yamagasa">山　笠</div>${rH(kR,'k')}
+<div class="sr-sheads"><div class="sr-sh">左</div><div class="sr-sh">右</div></div>
+<div style="text-align:center;font-size:10px;font-weight:700;color:#86868b;margin-top:2px">おくり ↑</div></div>
+<div class="sr-sec" style="padding-left:8px;border-left:1px solid #e8e8f0">
+<div style="font-size:11px;font-weight:800;color:#1d1d1f;margin-bottom:8px">棒切り情報</div>
+<div style="font-size:11px;font-weight:700;color:#e05a2b;margin-bottom:2px">おもて</div>
+<div style="font-size:10px;color:#6e6e73;margin-bottom:8px">${obT}</div>
+<div style="font-size:11px;font-weight:700;color:#e05a2b;margin-bottom:2px">おくり</div>
+<div style="font-size:10px;color:#6e6e73">${kbT}</div>
+</div></div>`};
+}
+
+// ===== Pure Canvas 2D JPEG生成 =====
+async function generateJpeg(){
+  const{oR,kR,obT,kbT}=buildShareHTML();
+  const ob=calcBokiri('o'),kb=calcBokiri('k');
+  function bkType(sec,num){const bk=sec==='o'?ob:kb;if(bk.N<6)return'';if(bk.normal===num)return'bn';if(bk.sw===num)return'bs';return'';}
+  function cellText(m){return m?sname(m)+'（'+m.age+'）':'';}
+
+  const scale=2;
+  const W=600;
+  const rowH=22;
+  const secHeadH=24;
+  const yamagasaH=28;
+  const headerH=40;
+  const legendH=22;
+  const colHeadH=18;
+  const bokiriInfoH=100;
+  const padding=14;
+  const leftColW=300;
+  const rightColW=W-leftColW-padding*2-8;
+
+  // Calculate total height
+  const totalRows=oR.length+kR.length;
+  const contentH=headerH+legendH+colHeadH+secHeadH+(oR.length*rowH)+yamagasaH+(kR.length*rowH)+colHeadH+secHeadH+40;
+  const H=Math.max(contentH+padding*2,bokiriInfoH+headerH+legendH+padding*2+60);
+
+  const canvas=document.getElementById('shareCanvas');
+  canvas.width=W*scale;
+  canvas.height=H*scale;
+  canvas.style.cssText='display:none;position:fixed;left:-9999px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(scale,scale);
+
+  // Background
+  ctx.fillStyle='#ffffff';
+  ctx.fillRect(0,0,W,H);
+
+  let y=padding;
+
+  // Header
+  ctx.fillStyle='#1d1d1f';
+  ctx.font='bold 15px -apple-system, "Hiragino Sans", sans-serif';
+  ctx.textBaseline='middle';
+  ctx.fillText('🎋 '+DAY_LABELS[cDay],padding,y+15);
+  ctx.fillStyle='#0071e3';
+  ctx.font='bold 11px -apple-system, "Hiragino Sans", sans-serif';
+  ctx.textAlign='right';
+  ctx.fillText('↑ 進行方向',W-padding,y+15);
+  ctx.textAlign='left';
+  y+=32;
+  // Header line
+  ctx.strokeStyle='#e0e0e8';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(padding,y);ctx.lineTo(W-padding,y);ctx.stroke();
+  y+=8;
+
+  // Legend
+  ctx.fillStyle='#e05a2b';
+  ctx.fillRect(padding,y,8,8);
+  ctx.fillStyle='#86868b';
+  ctx.font='500 10px -apple-system, "Hiragino Sans", sans-serif';
+  ctx.fillText('棒切り',padding+12,y+6);
+  ctx.fillStyle='#6b35c9';
+  ctx.fillRect(padding+60,y,8,8);
+  ctx.fillStyle='#86868b';
+  ctx.fillText('SW後棒切り',padding+72,y+6);
+  y+=legendH;
+
+  // Left column start X
+  const lx=padding;
+  // Right column (bokiri info) start X
+  const rx=leftColW+padding+8;
+
+  // Section title: おもて
+  ctx.fillStyle='#1d1d1f';
+  ctx.font='bold 11px -apple-system, "Hiragino Sans", sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('↑ おもて',lx+leftColW/2,y+10);
+  y+=secHeadH;
+
+  // Separator line under section title
+  ctx.strokeStyle='#e0e0e8';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(lx,y);ctx.lineTo(lx+leftColW,y);ctx.stroke();
+  y+=4;
+
+  // Column headers: 左 / 右
+  ctx.fillStyle='#c0c0d0';
+  ctx.font='600 9px -apple-system, "Hiragino Sans", sans-serif';
+  ctx.textAlign='center';
+  const numW=20;
+  const cellW=(leftColW-numW)/2;
+  ctx.fillText('左',lx+numW+cellW/2,y+8);
+  ctx.fillText('右',lx+numW+cellW+cellW/2,y+8);
+  y+=colHeadH;
+
+  function drawRow(n,l,r,sec,yPos){
+    const bk=bkType(sec,n);
+    const lText=cellText(l);
+    const rText=cellText(r);
+
+    // Row background for bokiri
+    if(bk==='bn'){
+      ctx.fillStyle='#fff0eb';
+      ctx.fillRect(lx,yPos,leftColW,rowH);
+    }else if(bk==='bs'){
+      ctx.fillStyle='#f0eaff';
+      ctx.fillRect(lx,yPos,leftColW,rowH);
+    }
+
+    // Row number
+    ctx.fillStyle='#86868b';
+    ctx.font='bold 10px -apple-system, "Hiragino Sans", sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText(String(n),lx+numW/2,yPos+rowH/2+1);
+
+    // Left cell
+    const cellPadX=4;
+    const cellY=yPos+2;
+    const cellH=rowH-4;
+    // Left cell bg
+    if(bk==='bn'){
+      ctx.fillStyle='#fff0eb';ctx.strokeStyle='#e05a2b';ctx.lineWidth=1;
+      roundRect(ctx,lx+numW+cellPadX,cellY,cellW-cellPadX*2,cellH,3,true,true);
+    }else if(bk==='bs'){
+      ctx.fillStyle='#f0eaff';ctx.strokeStyle='#6b35c9';ctx.lineWidth=1;
+      roundRect(ctx,lx+numW+cellPadX,cellY,cellW-cellPadX*2,cellH,3,true,true);
+    }else{
+      ctx.fillStyle='#f5f5f7';ctx.strokeStyle='transparent';ctx.lineWidth=0;
+      roundRect(ctx,lx+numW+cellPadX,cellY,cellW-cellPadX*2,cellH,3,true,false);
+    }
+    // Left cell text
+    ctx.fillStyle=bk==='bn'?'#c04010':bk==='bs'?'#5b21b6':'#1d1d1f';
+    ctx.font='bold 10px -apple-system, "Hiragino Sans", sans-serif';
+    ctx.textAlign='left';
+    const maxTextW=cellW-cellPadX*2-8;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(lx+numW+cellPadX+3,cellY,maxTextW,cellH);
+    ctx.clip();
+    ctx.fillText(lText,lx+numW+cellPadX+4,yPos+rowH/2+1);
+    ctx.restore();
+
+    // Right cell
+    const rcX=lx+numW+cellW+cellPadX;
+    if(bk==='bn'){
+      ctx.fillStyle='#fff0eb';ctx.strokeStyle='#e05a2b';ctx.lineWidth=1;
+      roundRect(ctx,rcX,cellY,cellW-cellPadX*2,cellH,3,true,true);
+    }else if(bk==='bs'){
+      ctx.fillStyle='#f0eaff';ctx.strokeStyle='#6b35c9';ctx.lineWidth=1;
+      roundRect(ctx,rcX,cellY,cellW-cellPadX*2,cellH,3,true,true);
+    }else{
+      ctx.fillStyle='#f5f5f7';
+      roundRect(ctx,rcX,cellY,cellW-cellPadX*2,cellH,3,true,false);
+    }
+    ctx.fillStyle=bk==='bn'?'#c04010':bk==='bs'?'#5b21b6':'#1d1d1f';
+    ctx.font='bold 10px -apple-system, "Hiragino Sans", sans-serif';
+    ctx.textAlign='left';
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(rcX+3,cellY,maxTextW,cellH);
+    ctx.clip();
+    ctx.fillText(rText,rcX+4,yPos+rowH/2+1);
+    ctx.restore();
+  }
+
+  // Draw omote rows
+  oR.forEach(([n,l,r])=>{
+    drawRow(n,l,r,'o',y);
+    y+=rowH;
+  });
+
+  // Yamagasa divider
+  ctx.strokeStyle='#1d1d1f';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(lx,y+4);ctx.lineTo(lx+leftColW,y+4);ctx.stroke();
+  ctx.fillStyle='#1d1d1f';
+  ctx.font='bold 12px -apple-system, "Hiragino Sans", sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('山　笠',lx+leftColW/2,y+yamagasaH/2+2);
+  ctx.beginPath();ctx.moveTo(lx,y+yamagasaH-4);ctx.lineTo(lx+leftColW,y+yamagasaH-4);ctx.stroke();
+  y+=yamagasaH;
+
+  // Draw okuri rows
+  kR.forEach(([n,l,r])=>{
+    drawRow(n,l,r,'k',y);
+    y+=rowH;
+  });
+
+  // Bottom column headers
+  y+=4;
+  ctx.fillStyle='#c0c0d0';
+  ctx.font='600 9px -apple-system, "Hiragino Sans", sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('左',lx+numW+cellW/2,y+8);
+  ctx.fillText('右',lx+numW+cellW+cellW/2,y+8);
+  y+=colHeadH;
+
+  // Bottom section label
+  ctx.fillStyle='#86868b';
+  ctx.font='bold 10px -apple-system, "Hiragino Sans", sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('おくり ↑',lx+leftColW/2,y+8);
+
+  // ===== Right column: Bokiri info =====
+  const bokiriY=headerH+legendH+padding+8;
+  // Vertical separator
+  ctx.strokeStyle='#e8e8f0';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(rx-4,bokiriY);ctx.lineTo(rx-4,bokiriY+bokiriInfoH);ctx.stroke();
+
+  ctx.textAlign='left';
+  let by=bokiriY;
+  ctx.fillStyle='#1d1d1f';
+  ctx.font='bold 11px -apple-system, "Hiragino Sans", sans-serif';
+  ctx.fillText('棒切り情報',rx,by+6);
+  by+=20;
+
+  ctx.fillStyle='#e05a2b';
+  ctx.font='bold 11px -apple-system, "Hiragino Sans", sans-serif';
+  ctx.fillText('おもて',rx,by+6);
+  by+=16;
+  ctx.fillStyle='#6e6e73';
+  ctx.font='500 10px -apple-system, "Hiragino Sans", sans-serif';
+  ctx.fillText(obT,rx,by+6);
+  by+=20;
+
+  ctx.fillStyle='#e05a2b';
+  ctx.font='bold 11px -apple-system, "Hiragino Sans", sans-serif';
+  ctx.fillText('おくり',rx,by+6);
+  by+=16;
+  ctx.fillStyle='#6e6e73';
+  ctx.font='500 10px -apple-system, "Hiragino Sans", sans-serif';
+  ctx.fillText(kbT,rx,by+6);
+
+  return canvas.toDataURL('image/jpeg',0.92);
+}
+
+function roundRect(ctx,x,y,w,h,r,fill,stroke){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+  if(fill)ctx.fill();
+  if(stroke)ctx.stroke();
+}
+
+async function downloadJpeg(){
+  const btn=document.getElementById('dlBtn');if(!btn)return;
+  btn.textContent='生成中...';btn.disabled=true;
+  try{
+    const dataUrl=await generateJpeg();
+    const a=document.createElement('a');
+    a.href=dataUrl;
+    a.download='山笠フォーメーション_'+DAY_LABELS[cDay].split(' ')[0].replace(/[\/\s:〜]+/g,'_')+'.jpg';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>document.body.removeChild(a),100);
+    showToast('ダウンロードしました');
+  }catch(e){
+    console.error('JPEG error:',e);
+    alert('JPEG生成エラー\n'+e.message+'\n\nフォーメーションにメンバーが配置されているか確認してください');
+  }
+  btn.textContent='JPEGダウンロード';btn.disabled=false;
+}
+async function shareToLine(){
+  const btn=document.getElementById('lineBtn');if(!btn)return;
+  btn.textContent='準備中...';btn.disabled=true;
+  try{
+    const dataUrl=await generateJpeg();
+    const a=document.createElement('a');
+    a.href=dataUrl;
+    a.download='yamakasa_'+DAY_LABELS[cDay].split(' ')[0]+'.jpg';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>document.body.removeChild(a),100);
+    await new Promise(r=>setTimeout(r,800));
+    try{
+      const res=await fetch(dataUrl);
+      const blob=await res.blob();
+      const file=new File([blob],'yamakasa.jpg',{type:'image/jpeg'});
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:'山笠フォーメーション',text:DAY_LABELS[cDay]});
+      }else{
+        alert('画像をダウンロードしました！\nダウンロードした画像をLINEに貼り付けて送信してください。');
+      }
+    }catch(e2){
+      if(e2.name!=='AbortError'){
+        alert('画像をダウンロードしました！\nダウンロードした画像をLINEに貼り付けて送信してください。');
+      }
+    }
+  }catch(e){
+    console.error('LINE share error:',e);
+    alert('エラーが発生しました\n'+e.message);
+  }
+  btn.textContent='LINEで送る';btn.disabled=false;
+}
+function renderShare(){
+  const hasData=Object.values(pl).some(p=>Object.values(p).some(Boolean));
+  if(!hasData){document.getElementById('main').innerHTML=`<div class="scard" style="text-align:center;padding:40px 20px"><div style="font-size:40px;margin-bottom:16px">📋</div><div style="font-size:15px;font-weight:600;color:var(--text-secondary)">フォーメーションを組んでから<br>このタブを開いてください</div></div>`;return;}
+  const{oR,kR,obT,kbT}=buildShareHTML();
+  const ob=calcBokiri('o'),kb=calcBokiri('k');
+  function bkC2(sec,num){const bk=sec==='o'?ob:kb;if(bk.N<6)return'';if(bk.normal===num)return'bn';if(bk.sw===num)return'bs';return'';}
+  function cT2(m){return m?`${sname(m)}（${m.age}）`:'';}
+  function rH2(rows,sec){return rows.map(([n,l,r])=>`<div class="sr-row"><div class="sr-num">${n}</div><div class="sr-cell ${bkC2(sec,n)}">${cT2(l)}</div><div class="sr-cell ${bkC2(sec,n)}">${cT2(r)}</div></div>`).join('');}
+  document.getElementById('main').innerHTML=`<div class="share-wrap">
+    <div class="share-actions"><button class="btn btn-dl" id="dlBtn" onclick="downloadJpeg()">JPEGダウンロード</button><button class="btn btn-line" id="lineBtn" onclick="shareToLine()">LINEで送る</button></div>
+    <div style="font-size:12px;font-weight:600;color:var(--text-tertiary);margin-bottom:8px">プレビュー</div>
+    <div style="background:#fff;border-radius:var(--radius-sm);border:1px solid rgba(0,0,0,0.06);padding:14px;overflow-x:auto">
+      <div class="sr-header"><div class="sr-title">🎋 ${DAY_LABELS[cDay]}</div><div class="sr-dir">↑ 進行方向</div></div>
+      <div class="sr-legend"><div class="sr-leg"><div class="sr-ldot" style="background:#e05a2b"></div>棒切り</div><div class="sr-leg"><div class="sr-ldot" style="background:#6b35c9"></div>SW後棒切り</div></div>
+      <div class="sr-cols"><div class="sr-sec"><div class="sr-sec-title">↑ おもて</div><div class="sr-sheads"><div class="sr-sh">左</div><div class="sr-sh">右</div></div>
+      ${rH2(oR,'o')}<div class="sr-yamagasa">山　笠</div>${rH2(kR,'k')}
+      <div class="sr-sheads"><div class="sr-sh">左</div><div class="sr-sh">右</div></div>
+      <div style="text-align:center;font-size:10px;font-weight:700;color:#86868b;margin-top:2px">おくり ↑</div></div>
+      <div class="sr-sec" style="padding-left:8px;border-left:1px solid #e8e8f0">
+        <div style="font-size:11px;font-weight:800;color:#1d1d1f;margin-bottom:8px">棒切り情報</div>
+        <div style="font-size:11px;font-weight:700;color:#e05a2b;margin-bottom:2px">おもて</div>
+        <div style="font-size:10px;color:#6e6e73;margin-bottom:8px">${obT}</div>
+        <div style="font-size:11px;font-weight:700;color:#e05a2b;margin-bottom:2px">おくり</div>
+        <div style="font-size:10px;color:#6e6e73">${kbT}</div>
+      </div></div>
+    </div>
+  </div>`;
+}
+
+// ===== メンバータブ =====
+function renderM(){
+  const dayM=getDay(cDay);
+  const inPool=dayM.filter(m=>pool.has(m.id)).sort((a,b)=>b.height-a.height);
+  const non=dayM.filter(m=>!pool.has(m.id)).sort((a,b)=>b.height-a.height);
+  const otherDay=members.filter(m=>!m.days[cDay]);
+
+  function lvLabel(l){return l===1?'初心者':l===2?'中級':'上級';}
+  function lvBtn(m){return `<button class="lbg lv${m.level}" onclick="event.stopPropagation();cycleLevel(${m.id})" style="width:30px;height:30px;font-size:10px;font-weight:800;border:none;border-radius:8px;cursor:pointer;flex-shrink:0" title="タップでレベル変更">${m.level===1?'初':m.level===2?'中':'上'}</button>`;}
+  function delBtn(m,style){return `<button class="btn btn-danger" style="padding:4px 8px;font-size:10px;${style||''}" onclick="event.stopPropagation();delMember(${m.id})">削除</button>`;}
+  function roleBtn(m){
+    const rc=m.role==='omote'?'rp-omote':m.role==='okuri'?'rp-okuri':'rp-free';
+    const rt=m.role==='omote'?'おもて固定':m.role==='okuri'?'おくり固定':'フリー';
+    return `<button class="role-pill ${rc}" onclick="event.stopPropagation();cycleRole(${m.id})">${rt} ↺</button>`;
+  }
+
+  let h=`<div class="controls">
+    <button class="btn btn-save" onclick="saveData(true)">保存</button>
+    <button class="btn btn-success" onclick="toggleForm()">${showForm?'× 閉じる':'＋ 手動追加'}</button>
+  </div>
+  <div class="reset-area">
+    <div class="reset-area-title">リセット</div>
+    <div class="controls">
+      <button class="btn btn-danger" onclick="resetMembers()">名簿を全リセット</button>
+      <button class="btn btn-warn" onclick="resetFormation()">フォーメーションのみリセット</button>
+      <button class="btn btn-danger" onclick="deleteAllMembers()" style="background:#7f1d1d;color:#fff">全員今すぐ削除</button>
+    </div>
+    <div style="font-size:10px;color:var(--text-tertiary);margin-top:8px">名簿リセットはフォーメーションも同時に削除されます</div>
+  </div>`;
+
+  h+=`<div class="scard" style="border:2px solid var(--accent)">
+    <div class="scard-title">スプレッドシートからコピペで一括追加</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;line-height:1.7">
+      1. スプシで<b>1行目（ヘッダー）から最終行まで全列を選択</b>してコピー<br>
+      2. 下のボックスに貼り付け（Ctrl+V / Cmd+V）→「追加する」
+    </div>
+    <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:8px;background:var(--bg-secondary);padding:8px 10px;border-radius:var(--radius-xs)">
+      氏名・年齢・身長・参加日を自動認識 / ヘッダー行は自動スキップ
+    </div>
+    <textarea id="pasteArea" placeholder="ここにスプレッドシートからコピペ" style="width:100%;height:100px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.1);border-radius:var(--radius-xs);font-size:13px;color:var(--text-primary);background:var(--bg);resize:vertical;font-family:inherit;line-height:1.5" oninput="updatePastePreview()"></textarea>
+    <div id="pastePreview" style="font-size:11px;margin:6px 0 10px"></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn btn-primary" onclick="importPaste()">追加する</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('pasteArea').value='';updatePastePreview()">クリア</button>
+      <div id="pastemsg" style="font-size:12px;color:var(--text-tertiary)"></div>
+    </div>
+  </div>`;
+
+  if(showForm){
+    h+=`<div class="scard" style="border:2px solid var(--accent)"><div class="scard-title">手動追加</div>
+      <div class="form-grid">
+        <div class="form-field full"><div class="form-label">名前 *</div><input class="form-input" id="fn" placeholder="山田 太郎" type="text"></div>
+        <div class="form-field"><div class="form-label">身長 (cm) *</div><input class="form-input" id="fh" placeholder="170" type="number" min="140" max="220"></div>
+        <div class="form-field"><div class="form-label">年齢 *</div><input class="form-input" id="fa" placeholder="30" type="number" min="10" max="90"></div>
+        <div class="form-field"><div class="form-label">レベル</div><select class="form-select" id="fl"><option value="1">1 初心者</option><option value="2" selected>2 中級</option><option value="3">3 上級</option></select></div>
+        <div class="form-field"><div class="form-label">役割</div><select class="form-select" id="fr"><option value="any">フリー</option><option value="omote">おもて固定</option><option value="okuri">おくり固定</option></select></div>
+        <div class="form-field full"><div class="form-label">参加日</div><div class="day-checks">
+          <label class="day-check"><input type="checkbox" id="fd0" checked> 4/26</label>
+          <label class="day-check"><input type="checkbox" id="fd1" checked> 5/9</label>
+          <label class="day-check"><input type="checkbox" id="fd2" checked> 5/10</label>
+        </div></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-primary" onclick="addMember()">追加する</button>
+        <button class="btn btn-ghost" onclick="toggleForm()">キャンセル</button>
+        <div id="form-err" style="font-size:12px;color:var(--danger);font-weight:600"></div>
+      </div></div>`;
+  }
+
+  h+=`<div class="scard"><div class="scard-title">配置対象（${inPool.length}人）</div>`;
+  inPool.forEach(m=>{
+    const rc=m.role==='omote'?'rp-omote':m.role==='okuri'?'rp-okuri':'rp-free';
+    const rt=m.role==='omote'?'おもて固定':m.role==='okuri'?'おくり固定':'フリー';
+    h+=`<div class="mchip in-pool" onclick="togglePool(${m.id})">
+      ${lvBtn(m)}
+      <div style="flex:1">
+        <div class="mname">${m.name}${m.manual?'<span class="tag-new">手動</span>':''}</div>
+        <div class="msub">${m.height}cm・${m.age}歳　<span style="font-size:10px;color:var(--accent)">${lvLabel(m.level)} ↺</span></div>
+      </div>
+      <button class="role-pill ${rc}" onclick="event.stopPropagation();cycleRole(${m.id})">${rt} ↺</button>
+      <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;margin-left:4px" onclick="event.stopPropagation();delMember(${m.id})">削除</button>
+    </div>`;
+  });
+  if(!inPool.length) h+=`<div style="font-size:13px;color:var(--text-tertiary)">なし — コピペかCSVで追加してください</div>`;
+  h+=`</div>`;
+
+  h+=`<div class="scard">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+      <div class="scard-title" style="margin-bottom:0">${DAY_LABELS[cDay].split(' ')[0]} 参加・未配置（${non.length}人）</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-primary" style="font-size:11px;padding:6px 12px" onclick="allInDay()">全員を配置対象に</button>
+        <button class="btn btn-ghost" style="font-size:11px;padding:6px 12px" onclick="clearPool()">クリア</button>
+      </div>
+    </div>`;
+  non.forEach(m=>{
+    h+=`<div class="mchip" onclick="togglePool(${m.id})">
+      ${lvBtn(m)}
+      <div style="flex:1">
+        <div class="mname">${m.name}${m.manual?'<span class="tag-new">手動</span>':''}</div>
+        <div class="msub">${m.height}cm・${m.age}歳　<span style="font-size:10px;color:var(--accent)">${lvLabel(m.level)} ↺</span></div>
+      </div>
+      <button class="btn btn-danger" style="padding:4px 8px;font-size:10px" onclick="event.stopPropagation();delMember(${m.id})">削除</button>
+    </div>`;
+  });
+  if(!non.length&&inPool.length>0) h+=`<div style="font-size:13px;color:var(--success);font-weight:600">全員配置対象済</div>`;
+  if(!non.length&&!inPool.length) h+=`<div style="font-size:13px;color:var(--text-tertiary)">メンバーがいません</div>`;
+  h+=`</div>`;
+
+  if(otherDay.length>0){
+    h+=`<div class="scard" style="opacity:0.55"><div class="scard-title">この日は不参加（${otherDay.length}人）</div>`;
+    otherDay.forEach(m=>{
+      const dp=[m.days[0]?'4/26':'',m.days[1]?'5/9':'',m.days[2]?'5/10':''].filter(Boolean).join('・');
+      h+=`<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:var(--radius-xs);margin-bottom:3px;background:var(--bg-secondary)">
+        <span class="lbg lv${m.level}">${m.level===1?'初':m.level===2?'中':'上'}</span>
+        <div style="flex:1;font-size:12px;color:var(--text-secondary)">${m.name}</div>
+        <div style="font-size:10px;color:var(--text-tertiary)">${dp||'未設定'}</div>
+        <button class="btn btn-danger" style="padding:2px 8px;font-size:10px" onclick="delMember(${m.id})">削除</button>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  document.getElementById('main').innerHTML=h;
+}
+
+
+function toggleForm(){showForm=!showForm;render();}
+function addMember(){
+  const name=document.getElementById('fn').value.trim(),height=parseInt(document.getElementById('fh').value),age=parseInt(document.getElementById('fa').value),level=parseInt(document.getElementById('fl').value),role=document.getElementById('fr').value;
+  const days=[document.getElementById('fd0').checked?1:0,document.getElementById('fd1').checked?1:0,document.getElementById('fd2').checked?1:0];
+  const err=document.getElementById('form-err');
+  if(!name){err.textContent='名前を入力';return;}if(!height||height<140||height>220){err.textContent='身長140〜220cm';return;}if(!age||age<10||age>90){err.textContent='年齢を入力';return;}
+  const m={id:nextId++,name,height,age,level,role,days,manual:true};
+  members.push(m);pool.add(m.id);showForm=false;autoSave();render();
+}
+function deleteAllMembers(){
+  if(!confirm('名簿の全員を削除しますか？\nフォーメーションも同時にリセットされます。'))return;
+  members=[];pool=new Set();nextId=1;
+  pl={ol:{},or:{},kl:{},kr:{}};
+  lkPos={ol:new Set(),or:new Set(),kl:new Set(),kr:new Set()};
+  lkPair={o:new Set(),k:new Set()};
+  mode='normal';sel=null;ins=null;
+  autoSave();showToast('全員削除しました');render();
+}
+function delMember(id){if(!confirm('削除しますか？'))return;members=members.filter(m=>m.id!==id);pool.delete(id);Object.keys(pl).forEach(s=>{Object.keys(pl[s]).forEach(n=>{if(pl[s][n]===id)pl[s][n]=null;});});autoSave();render();}
+function togglePool(id){if(pool.has(id))pool.delete(id);else pool.add(id);autoSave();render();}
+function allIn(){getDay(cDay).forEach(m=>pool.add(m.id));autoSave();render();}
+function allInDay(){
+  const before=pool.size;
+  getDay(cDay).forEach(m=>pool.add(m.id));
+  const added=pool.size-before;
+  autoSave();
+  showToast(added>0?`${added}人を配置対象に追加しました`:'すでに全員配置対象です');
+  render();
+}
+function resetMembers(){
+  if(!confirm('名簿をリセットしますか？\nフォーメーションも同時に削除されます。'))return;
+  members=[];pool=new Set();nextId=1;pl={ol:{},or:{},kl:{},kr:{}};
+  lkPos={ol:new Set(),or:new Set(),kl:new Set(),kr:new Set()};
+  lkPair={o:new Set(),k:new Set()};
+  mode='normal';sel=null;ins=null;autoSave();showToast('名簿をリセットしました');render();
+}
+function resetFormation(){
+  if(!confirm('フォーメーションをリセットしますか？\n名簿はそのまま残ります。'))return;
+  pl={ol:{},or:{},kl:{},kr:{}};
+  lkPos={ol:new Set(),or:new Set(),kl:new Set(),kr:new Set()};
+  lkPair={o:new Set(),k:new Set()};
+  mode='normal';sel=null;ins=null;autoSave();showToast('フォーメーションをリセットしました');render();
+}
+function clearPool(){pool.clear();autoSave();render();}
+function cycleLevel(id){const m=byId(id);if(!m)return;m.level=m.level===1?2:m.level===2?3:1;autoSave();showToast("レベル変更: "+['初心者','中級','上級'][m.level-1]);render();}
+function cycleRole(id){const m=byId(id);if(!m)return;m.role=m.role==='any'?'omote':m.role==='omote'?'okuri':'any';autoSave();render();}
+
+// ===== スプシコピペ読み込み =====
+function updatePastePreview(){
+  const text=document.getElementById('pasteArea')?.value||'';
+  const prev=document.getElementById('pastePreview');if(!prev)return;
+  if(!text.trim()){prev.innerHTML='';return;}
+  const{results}=parsePasteText(text);
+  if(results.length===0){
+    prev.innerHTML='<span style="color:var(--warning)">データが読み取れません</span>';return;
+  }
+  const sample=results.slice(0,3).map(r=>{
+    const d=[r.days[0]?'4/26':'',r.days[1]?'5/9':'',r.days[2]?'5/10':''].filter(Boolean).join('・');
+    return`${r.name}（${r.height}cm・${r.age}歳）[${d||'全日'}]`;
+  }).join('<br>');
+  prev.innerHTML=`<span style="color:var(--success)">${results.length}人検出</span><br><span style="color:var(--text-tertiary);font-size:10px">${sample}${results.length>3?'<br>他'+(results.length-3)+'人':''}</span>`;
+}
+
+function parseDays(s){
+  if(!s)return[1,1,1];
+  const d0=/4.?26|お汐井/.test(s)?1:0;
+  const d1=/5[^\d]*9[^\d]|5[^\d]*9$|本番[^\d]*1|1日目/.test(s)?1:0;
+  const d2=/5[^\d]*10|本番[^\d]*2|2日目/.test(s)?1:0;
+  return(d0||d1||d2)?[d0,d1,d2]:[1,1,1];
+}
+
+function parsePasteText(text){
+  const lines=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').trim().split('\n').filter(l=>l.trim());
+  if(lines.length===0)return{results:[],errors:0};
+  const sep=lines[0].includes('\t')?'\t':',';
+  const hdr=lines[0].split(sep).map(h=>h.trim().replace(/^"|"$/g,''));
+  let ni=-1,ai=-1,hi=-1,di=-1;
+  hdr.forEach((h,i)=>{
+    if(ni<0&&/氏名|お名前|名前|フルネーム/.test(h))ni=i;
+    if(ai<0&&/年齢/.test(h))ai=i;
+    if(hi<0&&/身長/.test(h))hi=i;
+    if(di<0&&/参加日/.test(h))di=i;
+  });
+  const hasHdr=ni>=0&&hi>=0;
+  const dataLines=hasHdr?lines.slice(1):lines;
+  const results=[];let errors=0;
+  for(const line of dataLines){
+    if(!line.trim())continue;
+    const cols=line.split(sep).map(c=>c.trim().replace(/^"|"$/g,'').trim());
+    let name,height,age,days;
+    if(hasHdr){
+      name=ni>=0?(cols[ni]||'').trim():'';
+      age=ai>=0?parseInt((cols[ai]||'').replace(/[^0-9]/g,'')||'0')||0:0;
+      height=hi>=0?parseInt((cols[hi]||'').replace(/[^0-9]/g,'')||'0')||0:0;
+      days=di>=0?parseDays(cols[di]||''):[1,1,1];
+    }else{
+      let nIdx=-1,hIdx=-1,aIdx=-1,dIdx=-1;
+      cols.forEach((c,i)=>{
+        const v=parseInt(c.replace(/[^0-9]/g,'')||'0');
+        if(nIdx<0&&!/^\d/.test(c.trim())&&c.trim().length>1&&!/^[\d\/\-\s:,年月日〜]+$/.test(c))nIdx=i;
+        else if(hIdx<0&&v>=130&&v<=220)hIdx=i;
+        else if(aIdx<0&&v>=5&&v<=100&&i!==hIdx)aIdx=i;
+        if(dIdx<0&&/4月|5月|お汐井|本番/.test(c))dIdx=i;
+      });
+      name=nIdx>=0?cols[nIdx]:'';
+      height=hIdx>=0?parseInt(cols[hIdx].replace(/[^0-9]/g,'')||'0')||0:0;
+      age=aIdx>=0?parseInt(cols[aIdx].replace(/[^0-9]/g,'')||'0')||0:0;
+      days=dIdx>=0?parseDays(cols[dIdx]):[1,1,1];
+    }
+    if(!name||name.length<1){errors++;continue;}
+    if(/氏名|お名前|名前|身長|年齢|フルネーム|タイムスタンプ|timestamp/i.test(name))continue;
+    if(!height||height<130||height>220){errors++;continue;}
+    results.push({name,height,age:age||0,days});
+  }
+  return{results,errors};
+}
+
+function importPaste(){
+  const text=document.getElementById('pasteArea')?.value||'';
+  const msg=document.getElementById('pastemsg');
+  if(!text.trim()){if(msg){msg.textContent='テキストを貼り付けてください';msg.style.color='var(--warning)';}return;}
+  const{results,errors}=parsePasteText(text);
+  if(results.length===0){if(msg){msg.textContent='データが読み取れません';msg.style.color='var(--danger)';}return;}
+  let added=0,skipped=0;
+  results.forEach(({name,height,age,days})=>{
+    if(members.find(m=>m.name===name)){skipped++;return;}
+    members.push({id:nextId++,name,height,age,level:2,role:'any',days,manual:false});
+    pool.add(members[members.length-1].id);added++;
+  });
+  let txt=`完了！${added}人追加`;
+  if(skipped)txt+=`（${skipped}人重複スキップ）`;
+  if(errors)txt+=`（${errors}行スキップ）`;
+  if(msg){msg.textContent=txt;msg.style.color='var(--success)';}
+  document.getElementById('pasteArea').value='';
+  const prev=document.getElementById('pastePreview');if(prev)prev.innerHTML='';
+  autoSave();render();
+}
+
+// ===== CSV読み込み =====
+async function loadSheet(){
+  const url=document.getElementById('su').value.trim();
+  if(!url){alert('URLを入力してください');return;}
+  const msg=document.getElementById('smsg');
+  msg.textContent='読み込み中...';msg.style.color='var(--accent)';
+  try{
+    let csvUrl=url;
+    if(url.includes('/edit'))csvUrl=url.replace(/\/edit.*$/,'/export?format=csv');
+    else if(url.includes('pub?')&&!url.includes('output=csv'))csvUrl=url.replace(/pub\?.*$/,'pub?output=csv');
+    const res=await fetch(csvUrl);
+    if(!res.ok)throw new Error(`取得失敗（${res.status}）`);
+    const text=await res.text();
+    const rows=text.split('\n').map(r=>{
+      const cols=[];let cur='',inQ=false;
+      for(let i=0;i<r.length;i++){
+        if(r[i]==='"'){if(inQ&&r[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+        else if(r[i]===','&&!inQ){cols.push(cur.trim());cur='';}
+        else cur+=r[i];
+      }
+      cols.push(cur.trim());return cols;
+    });
+    if(rows.length<2)throw new Error('データが空です');
+    const hdr=rows[0];
+    const ni=hdr.findIndex(h=>/氏名|お名前|名前|フルネーム/i.test(h));
+    const hi=hdr.findIndex(h=>/身長/i.test(h));
+    const ai=hdr.findIndex(h=>/年齢/i.test(h));
+    if(ni<0||hi<0)throw new Error(`列が見つかりません（列名：${hdr.slice(0,4).join('、')}）`);
+    let added=0,skipped=0,errors=0;
+    rows.slice(1).forEach(row=>{
+      if(row.every(c=>!c))return;
+      const name=row[ni]?.trim();
+      const height=parseInt(row[hi]?.replace(/[^0-9]/g,'')||'');
+      const age=parseInt(row[ai]?.replace(/[^0-9]/g,'')||'')||0;
+      if(!name||!height){errors++;return;}
+      if(members.find(m=>m.name===name)){skipped++;return;}
+      const m={id:nextId++,name,height,age,level:2,role:'any',days:[1,1,1],manual:false};
+      members.push(m);pool.add(m.id);added++;
+    });
+    let txt=`完了！${added}人追加`;
+    if(skipped)txt+=`（${skipped}人重複スキップ）`;
+    if(errors)txt+=`（${errors}行スキップ）`;
+    msg.textContent=txt;msg.style.color='var(--success)';
+    autoSave();render();
+  }catch(e){msg.textContent=`エラー: ${e.message}`;msg.style.color='var(--danger)';}
+}
+
+// ===== 自動配置 =====
+function autoPlace(){
+  const keep={ol:{},or:{},kl:{},kr:{}};
+  ['ol','or','kl','kr'].forEach(s=>{
+    lkPos[s].forEach(n=>{if(pl[s][n])keep[s][n]=pl[s][n];});
+    lkPair[s[0]].forEach(n=>{if(pl[s][n])keep[s][n]=pl[s][n];});
+  });
+  clearAll();
+  ['ol','or','kl','kr'].forEach(s=>Object.assign(pl[s],keep[s]));
+  const used=allPlaced();
+
+  let poolM=[...pool].map(id=>byId(id)).filter(Boolean).filter(m=>m.days[cDay]&&!used.has(m.id));
+  let oFixed=poolM.filter(m=>m.role==='omote');
+  let kFixed=poolM.filter(m=>m.role==='okuri');
+  let free=poolM.filter(m=>m.role==='any');
+
+  const hasOFilter=filters.hoMax<999||filters.hoMin>0||filters.aoMax<999||filters.aoMin>0;
+  const hasKFilter=filters.hkMax<999||filters.hkMin>0||filters.akMax<999||filters.akMin>0;
+  let oFree=[],kFree=[],both=[];
+  if(hasOFilter||hasKFilter){
+    free.forEach(m=>{
+      const mO=m.height<=filters.hoMax&&m.height>=filters.hoMin&&m.age<=filters.aoMax&&m.age>=filters.aoMin;
+      const mK=m.height<=filters.hkMax&&m.height>=filters.hkMin&&m.age<=filters.akMax&&m.age>=filters.akMin;
+      if(mO&&!mK)oFree.push(m);
+      else if(mK&&!mO)kFree.push(m);
+      else both.push(m);
+    });
+  }else{
+    both=[...free];
+  }
+  both.sort((a,b)=>b.height-a.height);
+  both.forEach((m,i)=>{i%2===0?oFree.push(m):kFree.push(m);});
+
+  let oPool=[...oFixed,...oFree];
+  let kPool=[...kFixed,...kFree];
+  while(oPool.length>kPool.length+1)kPool.unshift(oPool.pop());
+  while(kPool.length>oPool.length+1)oPool.unshift(kPool.pop());
+
+  function memberScore(m){
+    return (m.height * scores.height) + ((4-m.level) * scores.level) + (m.age * scores.age * 0.1);
+  }
+
+  function pairUp(arr){
+    arr.sort((a,b)=>memberScore(b)-memberScore(a));
+    const us=new Set(),pairs=[];
+    for(let i=0;i<arr.length;i++){
+      if(us.has(arr[i].id))continue;
+      let bestJ=-1,bestScore=Infinity;
+      for(let j=i+1;j<arr.length;j++){
+        if(us.has(arr[j].id))continue;
+        const hDiff=Math.abs(arr[i].height-arr[j].height);
+        const lDiff=Math.abs(arr[i].level-arr[j].level);
+        const ps=(hDiff*scores.height)+(lDiff*scores.level*3);
+        if(ps<bestScore){bestScore=ps;bestJ=j;}
+        if(hDiff===0&&lDiff===0)break;
+      }
+      if(bestJ>-1){pairs.push([arr[i],arr[bestJ]]);us.add(arr[i].id);us.add(arr[bestJ].id);}
+      else{pairs.push([arr[i],null]);us.add(arr[i].id);}
+    }
+    return pairs;
+  }
+
+  function assign(pairs,lk,rk){
+    let pi=0;
+    for(let num=1;num<=MAX&&pi<pairs.length;num++){
+      if(lkPos[lk].has(num)||lkPair[lk[0]].has(num))continue;
+      if(pl[lk][num]||pl[rk][num])continue;
+      pl[lk][num]=pairs[pi][0].id;
+      if(pairs[pi][1])pl[rk][num]=pairs[pi][1].id;
+      pi++;
+    }
+  }
+
+  assign(pairUp([...oPool]),'ol','or');
+  assign(pairUp([...kPool]),'kl','kr');
+  mode='normal';sel=null;autoSave();
+  showToast('自動入力完了');
+  render();
+}
+
+
+function clearExLocked(){
+  const keep={ol:{},or:{},kl:{},kr:{}};
+  ['ol','or','kl','kr'].forEach(s=>{lkPos[s].forEach(n=>{if(pl[s][n])keep[s][n]=pl[s][n];});const sec=s[0];lkPair[sec].forEach(n=>{if(pl[s][n])keep[s][n]=pl[s][n];});});
+  pl=keep;mode='normal';sel=null;autoSave();render();
+}
+function clearAll(){pl={ol:{},or:{},kl:{},kr:{}};mode='normal';sel=null;ins=null;render();}
+
+// ===== 設定タブ =====
+function renderS(){
+  document.getElementById('main').innerHTML=`<div class="scard"><div class="scard-title">自動入力スコア設定</div>
+    <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:10px;background:var(--bg-secondary);padding:8px 10px;border-radius:var(--radius-xs);line-height:1.6">
+      スライダーを右に動かすほどその要素を重視します<br>
+      <b style="color:var(--accent)">身長</b>：高くすると身長差の小さいペアを優先<br>
+      <b style="color:var(--success)">レベル</b>：高くすると同じレベル同士でペアを組む<br>
+      <b style="color:var(--warning)">年齢</b>：高くすると年齢差の小さいペアを優先<br>
+      ※ 全て0にすると身長順のみで配置
+    </div>
+    <div class="score-row"><div class="score-label">身長</div><input type="range" min="1" max="20" value="${scores.height}" oninput="scores.height=+this.value;document.getElementById('sh').textContent=this.value"><div class="score-val" id="sh">${scores.height}</div></div>
+    <div class="score-row"><div class="score-label">レベル</div><input type="range" min="0" max="10" value="${scores.level}" oninput="scores.level=+this.value;document.getElementById('sl').textContent=this.value"><div class="score-val" id="sl">${scores.level}</div></div>
+    <div class="score-row"><div class="score-label">年齢</div><input type="range" min="0" max="10" value="${scores.age}" oninput="scores.age=+this.value;document.getElementById('sa').textContent=this.value"><div class="score-val" id="sa">${scores.age}</div></div>
+  </div>
+  <div class="scard"><div class="scard-title">表 / 送り 自動振り分け条件</div>
+    <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">おもて条件</div>
+    <div class="filter-row"><div class="filter-label">身長</div><input type="number" value="${filters.hoMin||''}" placeholder="以上" oninput="filters.hoMin=+this.value||0"> 〜 <input type="number" value="${filters.hoMax===999?'':filters.hoMax}" placeholder="以下" oninput="filters.hoMax=+this.value||999"> cm</div>
+    <div class="filter-row"><div class="filter-label">年齢</div><input type="number" value="${filters.aoMin||''}" placeholder="以上" oninput="filters.aoMin=+this.value||0"> 〜 <input type="number" value="${filters.aoMax===999?'':filters.aoMax}" placeholder="以下" oninput="filters.aoMax=+this.value||999"> 歳</div>
+    <div style="font-size:13px;font-weight:700;color:var(--pair);margin:10px 0 8px">おくり条件</div>
+    <div class="filter-row"><div class="filter-label">身長</div><input type="number" value="${filters.hkMin||''}" placeholder="以上" oninput="filters.hkMin=+this.value||0"> 〜 <input type="number" value="${filters.hkMax===999?'':filters.hkMax}" placeholder="以下" oninput="filters.hkMax=+this.value||999"> cm</div>
+    <div class="filter-row"><div class="filter-label">年齢</div><input type="number" value="${filters.akMin||''}" placeholder="以上" oninput="filters.akMin=+this.value||0"> 〜 <input type="number" value="${filters.akMax===999?'':filters.akMax}" placeholder="以下" oninput="filters.akMax=+this.value||999"> 歳</div>
+    <button class="btn btn-ghost" style="margin-top:10px" onclick="filters={hoMax:999,hoMin:0,hkMax:999,hkMin:0,aoMax:999,aoMin:0,akMax:999,akMin:0};autoSave();showToast('条件をリセットしました');render()">リセット</button>
+  </div>
+  <div class="scard"><div class="scard-title">データ管理</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <button class="btn btn-save" onclick="saveData(true)">今すぐ保存</button>
+    </div>
+    <div class="reset-area">
+      <div class="reset-area-title">危険ゾーン</div>
+      <div class="controls">
+        <button class="btn btn-danger" onclick="resetMembers()">名簿全リセット</button>
+        <button class="btn btn-warn" onclick="resetFormation()">フォーメーションのみリセット</button>
+        <button class="btn btn-danger" style="background:#7f0000;color:#fff" onclick="clearAllData()">全データ完全削除</button>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text-tertiary);margin-top:10px;line-height:1.5">保存データはこのブラウザのlocalStorageに保存されます。<br>ブラウザのデータ消去で失われます。スマホ版とパソコン版はデータ共有されません。</div>
+  </div>`;
+}
+function clearAllData(){
+  if(!confirm('全データを完全に削除しますか？\nこの操作は元に戻せません！'))return;
+  localStorage.removeItem(SAVE_KEY);
+  members=[];pool=new Set();nextId=1;
+  pl={ol:{},or:{},kl:{},kr:{}};
+  lkPos={ol:new Set(),or:new Set(),kl:new Set(),kr:new Set()};
+  lkPair={o:new Set(),k:new Set()};
+  scores={height:10,level:4,age:2};filters={hoMax:999,hoMin:0,hkMax:999,hkMin:0,aoMax:999,aoMin:0,akMax:999,akMin:0};
+  sheetUrl='';cDay=0;mode='normal';sel=null;ins=null;
+  showToast('全データを削除しました');render();
+}
+
+function switchTab(t){cTab=t;['f','m','sh','s'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('active',x===t));render();}
+function switchDay(d){cDay=d;[0,1,2].forEach(i=>document.getElementById('day-'+i).classList.toggle('active',i===d));autoSave();render();}
+function render(){if(cTab==='m')renderM();else if(cTab==='sh')renderShare();else if(cTab==='s')renderS();else renderF();}
+
+// ===== 起動 =====
+(function(){
+  const loaded=loadData();
+  if(loaded){
+    [0,1,2].forEach(i=>document.getElementById('day-'+i).classList.toggle('active',i===cDay));
+    const st=document.getElementById('saveStatus');
+    if(st)st.textContent='前回のデータを復元しました';
+    setTimeout(()=>{const s=document.getElementById('saveStatus');if(s)s.textContent='変更すると自動で保存されます';},3000);
+  }
+  render();
+})();
+</script>
+</body></html>
