@@ -297,6 +297,176 @@ input[type=number]{
   border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;
 }
 .reset-area-title{font-size:12px;font-weight:700;color:var(--danger);margin-bottom:10px}
+
+/* ===== シミュレーションタブ ===== */
+.sim-wrap{padding:0 2px}
+.sim-table{
+  background:var(--bg);border-radius:var(--radius);
+  box-shadow:var(--shadow-md);overflow:hidden;margin-bottom:6px;
+}
+.sim-sec-head{
+  text-align:center;font-size:12px;font-weight:800;
+  letter-spacing:0.08em;padding:8px 0 4px;
+}
+.sim-col-head{
+  display:flex;align-items:center;padding:0 4px 4px;
+  border-bottom:1px solid var(--border);
+}
+.sim-col-head span{
+  font-size:9px;font-weight:600;color:var(--text-tertiary);text-align:center;
+}
+.sim-ch-num{width:28px;flex-shrink:0}
+.sim-ch-ord{width:32px;flex-shrink:0}
+.sim-ch-name{flex:1}
+.sim-ch-swap{width:28px;flex-shrink:0}
+/* --- 行 --- */
+.sim-row{
+  display:flex;align-items:center;padding:5px 4px;
+  border-bottom:1px solid rgba(0,0,0,0.04);
+  transition:background 0.3s ease;position:relative;
+}
+.sim-row:last-child{border-bottom:none}
+.sim-rnum{
+  width:28px;flex-shrink:0;text-align:center;
+  font-size:11px;font-weight:700;color:var(--text-tertiary);
+}
+.sim-ord{
+  width:32px;flex-shrink:0;text-align:center;
+}
+.sim-ord-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:50%;
+  font-size:10px;font-weight:800;
+  background:rgba(0,0,0,0.05);color:var(--text-tertiary);
+}
+.sim-member{
+  flex:1;min-width:0;padding:6px 6px;
+  border-radius:var(--radius-xs);text-align:center;
+  font-size:12px;font-weight:600;color:var(--text-primary);
+  background:var(--bg-secondary);
+  transition:transform 0.4s cubic-bezier(.4,0,.2,1),background 0.3s ease,box-shadow 0.3s ease;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sim-member.empty-m{color:var(--text-tertiary);font-weight:400;background:rgba(0,0,0,0.02)}
+.sim-swap-col{
+  width:28px;flex-shrink:0;text-align:center;
+  font-size:14px;color:rgba(0,0,0,0.12);
+  transition:color 0.3s ease;
+}
+/* --- 棒切りライン --- */
+.sim-bokiri{
+  height:0;border-top:2.5px dashed var(--bn);margin:0 28px;position:relative;
+}
+.sim-bokiri-label{
+  position:absolute;top:-9px;right:0;font-size:8px;font-weight:700;
+  color:var(--bn);background:var(--bg);padding:0 4px;
+}
+.sim-bokiri-sw{border-color:var(--bs)}
+.sim-bokiri-sw .sim-bokiri-label{color:var(--bs)}
+/* --- 山笠 --- */
+.sim-yamagasa{
+  text-align:center;font-size:12px;font-weight:800;color:var(--text-primary);
+  padding:6px 0;margin:4px 0;
+  border-top:2px solid var(--text-primary);border-bottom:2px solid var(--text-primary);
+  letter-spacing:0.18em;
+}
+/* --- アクティブ行 (おもて) --- */
+.sim-row.active-o{
+  background:rgba(0,113,227,0.08);
+}
+.sim-row.active-o .sim-rnum{color:var(--accent)}
+.sim-row.active-o .sim-ord-badge{
+  background:var(--accent);color:#fff;
+  animation:sim-badge-pop 0.4s ease;
+}
+.sim-row.active-o .sim-swap-col{color:var(--accent);font-weight:800}
+.sim-row.active-o .sim-member{
+  background:rgba(0,113,227,0.12);box-shadow:0 0 0 2px rgba(0,113,227,0.2);
+}
+.sim-row.active-o .sim-member-l{animation:sim-swap-r 1.4s cubic-bezier(.4,0,.2,1) infinite}
+.sim-row.active-o .sim-member-r{animation:sim-swap-l 1.4s cubic-bezier(.4,0,.2,1) infinite}
+.sim-row.active-o .sim-swap-col{animation:sim-arrow-pulse 1.4s ease infinite}
+/* --- アクティブ行 (おくり) --- */
+.sim-row.active-k{
+  background:rgba(224,90,43,0.08);
+}
+.sim-row.active-k .sim-rnum{color:var(--pair)}
+.sim-row.active-k .sim-ord-badge{
+  background:var(--pair);color:#fff;
+  animation:sim-badge-pop 0.4s ease;
+}
+.sim-row.active-k .sim-swap-col{color:var(--pair);font-weight:800}
+.sim-row.active-k .sim-member{
+  background:rgba(224,90,43,0.12);box-shadow:0 0 0 2px rgba(224,90,43,0.2);
+}
+.sim-row.active-k .sim-member-l{animation:sim-swap-r 1.4s cubic-bezier(.4,0,.2,1) infinite}
+.sim-row.active-k .sim-member-r{animation:sim-swap-l 1.4s cubic-bezier(.4,0,.2,1) infinite}
+.sim-row.active-k .sim-swap-col{animation:sim-arrow-pulse-k 1.4s ease infinite}
+/* --- 次の行 --- */
+.sim-row.next-o{background:rgba(0,113,227,0.03)}
+.sim-row.next-o .sim-ord-badge{background:rgba(0,113,227,0.15);color:var(--accent)}
+.sim-row.next-k{background:rgba(224,90,43,0.03)}
+.sim-row.next-k .sim-ord-badge{background:rgba(224,90,43,0.15);color:var(--pair)}
+/* --- 完了行 --- */
+.sim-row.done{opacity:0.35}
+.sim-row.done .sim-ord-badge{background:rgba(52,199,89,0.15);color:var(--success)}
+/* --- アニメーション --- */
+@keyframes sim-swap-r{
+  0%,100%{transform:translateX(0)}
+  35%{transform:translateX(18px)}
+  65%{transform:translateX(18px)}
+}
+@keyframes sim-swap-l{
+  0%,100%{transform:translateX(0)}
+  35%{transform:translateX(-18px)}
+  65%{transform:translateX(-18px)}
+}
+@keyframes sim-arrow-pulse{
+  0%,100%{color:var(--accent);transform:scale(1)}
+  35%{color:var(--accent);transform:scale(1.5)}
+  65%{color:var(--accent);transform:scale(1.5)}
+}
+@keyframes sim-arrow-pulse-k{
+  0%,100%{color:var(--pair);transform:scale(1)}
+  35%{color:var(--pair);transform:scale(1.5)}
+  65%{color:var(--pair);transform:scale(1.5)}
+}
+@keyframes sim-badge-pop{
+  0%{transform:scale(0.5)}50%{transform:scale(1.15)}100%{transform:scale(1)}
+}
+/* --- コントロール --- */
+.sim-controls{
+  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+  padding:12px 0;position:sticky;bottom:0;
+  background:rgba(245,245,247,0.92);
+  -webkit-backdrop-filter:saturate(180%) blur(12px);
+  backdrop-filter:saturate(180%) blur(12px);
+  border-radius:var(--radius) var(--radius) 0 0;
+  margin:0 -10px;padding:12px 10px;
+}
+.sim-btn{
+  padding:10px 16px;border:none;border-radius:980px;
+  font-size:13px;font-weight:700;cursor:pointer;
+  transition:all 0.2s ease;-webkit-appearance:none;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.sim-btn:active{transform:scale(0.95);opacity:0.85}
+.sim-btn-next{background:var(--accent);color:#fff}
+.sim-btn-play{background:var(--success);color:#fff}
+.sim-btn-play.playing{background:var(--danger)}
+.sim-btn-mode{background:rgba(0,0,0,0.06);color:var(--text-secondary)}
+.sim-btn-mode.sw{background:rgba(107,53,201,0.12);color:#6b35c9}
+.sim-btn-reset{background:rgba(0,0,0,0.04);color:var(--text-tertiary)}
+/* --- ステータス --- */
+.sim-status{
+  text-align:center;padding:10px 14px;margin-bottom:8px;
+  background:var(--bg);border-radius:var(--radius);box-shadow:var(--shadow-sm);
+  font-size:12px;font-weight:600;color:var(--text-secondary);
+}
+.sim-status .step-num-label{color:var(--accent);font-weight:800;font-size:16px}
+.sim-speed-bar{
+  display:flex;gap:4px;justify-content:center;margin-bottom:8px;
+}
 </style>
 </head>
 <body>
@@ -304,8 +474,9 @@ input[type=number]{
   <div class="app-header">山笠フォーメーション管理</div>
   <div class="save-status" id="saveStatus"></div>
   <div class="tabs">
-    <div class="tab active" id="tab-f" onclick="switchTab('f')">フォーメーション</div>
+    <div class="tab active" id="tab-f" onclick="switchTab('f')">配置</div>
     <div class="tab" id="tab-m" onclick="switchTab('m')">メンバー</div>
+    <div class="tab" id="tab-sim" onclick="switchTab('sim')">シミュレーション</div>
     <div class="tab" id="tab-sh" onclick="switchTab('sh')">配布用</div>
     <div class="tab" id="tab-s" onclick="switchTab('s')">設定</div>
   </div>
@@ -362,9 +533,6 @@ function loadData(){
     lkPair={o:new Set(d.lkPair?.o||[]),k:new Set(d.lkPair?.k||[])};
     scores=d.scores||{height:10,level:4,age:2};
     filters=d.filters||{hoMax:999,hoMin:0,hkMax:999,hkMin:0,aoMax:999,aoMin:0,akMax:999,akMin:0};
-    if(filters.hoMax<999&&filters.hoMax<=175&&filters.hkMin>=165){
-      filters={hoMax:999,hoMin:0,hkMax:999,hkMin:0,aoMax:999,aoMin:0,akMax:999,akMin:0};
-    }
     sheetUrl=d.sheetUrl||'';cDay=d.cDay||0;
     return true;
   }catch(e){return false;}
@@ -406,19 +574,72 @@ function otherSide(side){return side.endsWith('l')?side.slice(0,-1)+'r':side.sli
 function isPairLocked(side,num){return lkPair[side.startsWith('o')?'o':'k'].has(num);}
 
 // ===== フォーメーション操作 =====
-function compactSec(sec,n){const lk=sec+'l',rk=sec+'r';for(let i=n;i<MAX;i++){pl[lk][i]=pl[lk][i+1]||null;pl[rk][i]=pl[rk][i+1]||null;}pl[lk][MAX]=null;pl[rk][MAX]=null;}
+
+// ロック情報も一緒にコンパクト（番号をn以降1つ前にずらす）
+function compactSec(sec,n){
+  const lk=sec+'l',rk=sec+'r';
+  for(let i=n;i<MAX;i++){
+    pl[lk][i]=pl[lk][i+1]||null;
+    pl[rk][i]=pl[rk][i+1]||null;
+    // 🔐をずらす
+    if(lkPos[lk].has(i+1)){lkPos[lk].add(i);lkPos[rk].add(i);}
+    else{lkPos[lk].delete(i);lkPos[rk].delete(i);}
+    // ♡をずらす
+    if(lkPair[sec].has(i+1))lkPair[sec].add(i);
+    else lkPair[sec].delete(i);
+  }
+  pl[lk][MAX]=null;pl[rk][MAX]=null;
+  lkPos[lk].delete(MAX);lkPos[rk].delete(MAX);
+  lkPair[sec].delete(MAX);
+}
+
+// ロック情報も一緒に展開（番号をtN以降1つ後ろにずらす）
+function expandLocks(sec,tN){
+  const lk=sec+'l',rk=sec+'r';
+  for(let i=MAX;i>=tN;i--){
+    if(i+1<=MAX){
+      // 🔐をずらす
+      if(lkPos[lk].has(i)){lkPos[lk].add(i+1);lkPos[rk].add(i+1);}
+      else{lkPos[lk].delete(i+1);lkPos[rk].delete(i+1);}
+      // ♡をずらす
+      if(lkPair[sec].has(i))lkPair[sec].add(i+1);
+      else lkPair[sec].delete(i+1);
+    }
+  }
+  // 挿入先をクリア（挿入元のロック情報を後で設定する）
+  lkPos[lk].delete(tN);lkPos[rk].delete(tN);
+  lkPair[sec].delete(tN);
+}
+
 function doInsert(tS,tN,sS,sN){
   const tl=tS+'l',tr=tS+'r',sl=sS+'l',sr=sS+'r';
   const iL=pl[sl][sN],iR=pl[sr][sN];if(!iL&&!iR)return;
+  // 元位置のロック情報を記憶
+  const hadPos=lkPos[sl].has(sN);
+  const hadPair=lkPair[sS].has(sN);
   if(sS===tS){
-    pl[sl][sN]=null;pl[sr][sN]=null;compactSec(sS,sN);
+    pl[sl][sN]=null;pl[sr][sN]=null;
+    // ロック情報を削除してからcompact
+    lkPos[sl].delete(sN);lkPos[sr].delete(sN);
+    lkPair[sS].delete(sN);
+    compactSec(sS,sN);
     const adj=sN<tN?tN-1:tN;
     for(let i=MAX;i>=adj;i--){if(i+1<=MAX){pl[tl][i+1]=pl[tl][i]||null;pl[tr][i+1]=pl[tr][i]||null;}}
+    expandLocks(tS,adj);
     pl[tl][adj]=iL||null;pl[tr][adj]=iR||null;
+    // ロック情報を移動先に復元
+    if(hadPos){lkPos[tl].add(adj);lkPos[tr].add(adj);}
+    if(hadPair)lkPair[tS].add(adj);
   }else{
-    pl[sl][sN]=null;pl[sr][sN]=null;compactSec(sS,sN);
+    pl[sl][sN]=null;pl[sr][sN]=null;
+    lkPos[sl].delete(sN);lkPos[sr].delete(sN);
+    lkPair[sS].delete(sN);
+    compactSec(sS,sN);
     for(let i=MAX;i>=tN;i--){if(i+1<=MAX){pl[tl][i+1]=pl[tl][i]||null;pl[tr][i+1]=pl[tr][i]||null;}}
+    expandLocks(tS,tN);
     pl[tl][tN]=iL||null;pl[tr][tN]=iR||null;
+    if(hadPos){lkPos[tl].add(tN);lkPos[tr].add(tN);}
+    if(hadPair)lkPair[tS].add(tN);
   }
 }
 function clickNum(sec,num){if(mode==='ins'&&ins.sec===sec&&ins.num===num){mode='normal';ins=null;render();return;}mode='ins';ins={sec,num};sel=null;render();}
@@ -428,15 +649,46 @@ function clickSlot(side,num){
   if(mode==='normal'){if(isPairLocked(side,num)){sel={type:'slot',side,num};mode='pair';render();return;}sel={type:'slot',side,num};mode='sel';render();return;}
   if(mode==='sel'){
     if(sel.type==='slot'&&sel.side===side&&sel.num===num){mode='normal';sel=null;render();return;}
-    if(sel.type==='slot'){const fId=pl[sel.side][sel.num],tId=pl[side][num];pl[sel.side][sel.num]=tId||null;pl[side][num]=fId||null;}
+    if(sel.type==='slot'){
+      const fId=pl[sel.side][sel.num],tId=pl[side][num];
+      pl[sel.side][sel.num]=tId||null;pl[side][num]=fId||null;
+      // 個別スロット移動でも🔐を追従させる
+      const fSec=sel.side.startsWith('o')?'o':'k',fN=sel.num;
+      const tSec=side.startsWith('o')?'o':'k',tN=num;
+      // 同一セクション・同一番号の左右間移動か、異なる番号への移動かを判定
+      const fSide2=sel.side,tSide2=side;
+      const fHadLk=lkPos[fSide2].has(fN);
+      const tHadLk=lkPos[tSide2].has(tN);
+      lkPos[fSide2].delete(fN);lkPos[tSide2].delete(tN);
+      if(fHadLk)lkPos[tSide2].add(tN);
+      if(tHadLk)lkPos[fSide2].add(fN);
+    }
     else if(sel.type==='unplaced'){pl[side][num]=sel.id;}
     mode='normal';sel=null;autoSave();render();return;
   }
   if(mode==='pair'){
     if(sel.type==='slot'&&sel.side===side&&sel.num===num){mode='normal';sel=null;render();return;}
     const fS=sel.side.startsWith('o')?'o':'k',fN=sel.num;
-    const fL=pl[fS+'l'][fN],fR=pl[fS+'r'][fN],tL=pl[sec+'l'][num],tR=pl[sec+'r'][num];
-    pl[fS+'l'][fN]=tL||null;pl[fS+'r'][fN]=tR||null;pl[sec+'l'][num]=fL||null;pl[sec+'r'][num]=fR||null;
+    const tS=sec;
+    // メンバーをスワップ
+    const fL=pl[fS+'l'][fN],fR=pl[fS+'r'][fN],tL=pl[tS+'l'][num],tR=pl[tS+'r'][num];
+    pl[fS+'l'][fN]=tL||null;pl[fS+'r'][fN]=tR||null;pl[tS+'l'][num]=fL||null;pl[tS+'r'][num]=fR||null;
+    // ペア固定(♡)もメンバーと一緒に移動させる
+    const fHadPair=lkPair[fS].has(fN);
+    const tHadPair=lkPair[tS].has(num);
+    // 一旦両方削除
+    lkPair[fS].delete(fN);
+    lkPair[tS].delete(num);
+    // 移動先にペア固定を付け替え
+    if(fHadPair)lkPair[tS].add(num);
+    if(tHadPair)lkPair[fS].add(fN);
+    // ポジション固定(🔐)も同様に付け替え
+    const fHadPos=lkPos[fS+'l'].has(fN);
+    const tHadPos=lkPos[tS+'l'].has(num);
+    lkPos[fS+'l'].delete(fN);lkPos[fS+'r'].delete(fN);
+    lkPos[tS+'l'].delete(num);lkPos[tS+'r'].delete(num);
+    if(fHadPos){lkPos[tS+'l'].add(num);lkPos[tS+'r'].add(num);}
+    if(tHadPos){lkPos[fS+'l'].add(fN);lkPos[fS+'r'].add(fN);}
     mode='normal';sel=null;autoSave();render();return;
   }
 }
@@ -1244,20 +1496,28 @@ function autoPlace(){
   const used=allPlaced();
 
   let poolM=[...pool].map(id=>byId(id)).filter(Boolean).filter(m=>m.days[cDay]&&!used.has(m.id));
-  let oFixed=poolM.filter(m=>m.role==='omote');
-  let kFixed=poolM.filter(m=>m.role==='okuri');
+  let oFixedRaw=poolM.filter(m=>m.role==='omote');
+  let kFixedRaw=poolM.filter(m=>m.role==='okuri');
   let free=poolM.filter(m=>m.role==='any');
 
   const hasOFilter=filters.hoMax<999||filters.hoMin>0||filters.aoMax<999||filters.aoMin>0;
   const hasKFilter=filters.hkMax<999||filters.hkMin>0||filters.akMax<999||filters.akMin>0;
+
+  function matchO(m){return m.height<=filters.hoMax&&m.height>=filters.hoMin&&m.age<=filters.aoMax&&m.age>=filters.aoMin;}
+  function matchK(m){return m.height<=filters.hkMax&&m.height>=filters.hkMin&&m.age<=filters.akMax&&m.age>=filters.akMin;}
+
+  let oFixed=hasOFilter?oFixedRaw.filter(matchO):oFixedRaw;
+  let kFixed=hasKFilter?kFixedRaw.filter(matchK):kFixedRaw;
+
   let oFree=[],kFree=[],both=[];
   if(hasOFilter||hasKFilter){
     free.forEach(m=>{
-      const mO=m.height<=filters.hoMax&&m.height>=filters.hoMin&&m.age<=filters.aoMax&&m.age>=filters.aoMin;
-      const mK=m.height<=filters.hkMax&&m.height>=filters.hkMin&&m.age<=filters.akMax&&m.age>=filters.akMin;
-      if(mO&&!mK)oFree.push(m);
-      else if(mK&&!mO)kFree.push(m);
-      else both.push(m);
+      const mO=!hasOFilter||matchO(m);
+      const mK=!hasKFilter||matchK(m);
+      if(mO&&mK)both.push(m);
+      else if(mO)oFree.push(m);
+      else if(mK)kFree.push(m);
+      // マッチしないメンバーは配置しない
     });
   }else{
     both=[...free];
@@ -1318,7 +1578,7 @@ function clearExLocked(){
   ['ol','or','kl','kr'].forEach(s=>{lkPos[s].forEach(n=>{if(pl[s][n])keep[s][n]=pl[s][n];});const sec=s[0];lkPair[sec].forEach(n=>{if(pl[s][n])keep[s][n]=pl[s][n];});});
   pl=keep;mode='normal';sel=null;autoSave();render();
 }
-function clearAll(){pl={ol:{},or:{},kl:{},kr:{}};mode='normal';sel=null;ins=null;render();}
+function clearAll(){pl={ol:{},or:{},kl:{},kr:{}};lkPos={ol:new Set(),or:new Set(),kl:new Set(),kr:new Set()};lkPair={o:new Set(),k:new Set()};mode='normal';sel=null;ins=null;autoSave();render();}
 
 // ===== 設定タブ =====
 function renderS(){
@@ -1336,11 +1596,11 @@ function renderS(){
   </div>
   <div class="scard"><div class="scard-title">表 / 送り 自動振り分け条件</div>
     <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">おもて条件</div>
-    <div class="filter-row"><div class="filter-label">身長</div><input type="number" value="${filters.hoMin||''}" placeholder="以上" oninput="filters.hoMin=+this.value||0"> 〜 <input type="number" value="${filters.hoMax===999?'':filters.hoMax}" placeholder="以下" oninput="filters.hoMax=+this.value||999"> cm</div>
-    <div class="filter-row"><div class="filter-label">年齢</div><input type="number" value="${filters.aoMin||''}" placeholder="以上" oninput="filters.aoMin=+this.value||0"> 〜 <input type="number" value="${filters.aoMax===999?'':filters.aoMax}" placeholder="以下" oninput="filters.aoMax=+this.value||999"> 歳</div>
+    <div class="filter-row"><div class="filter-label">身長</div><input type="number" value="${filters.hoMin||''}" placeholder="以上" oninput="filters.hoMin=+this.value||0;autoSave()"> 〜 <input type="number" value="${filters.hoMax===999?'':filters.hoMax}" placeholder="以下" oninput="filters.hoMax=+this.value||999;autoSave()"> cm</div>
+    <div class="filter-row"><div class="filter-label">年齢</div><input type="number" value="${filters.aoMin||''}" placeholder="以上" oninput="filters.aoMin=+this.value||0;autoSave()"> 〜 <input type="number" value="${filters.aoMax===999?'':filters.aoMax}" placeholder="以下" oninput="filters.aoMax=+this.value||999;autoSave()"> 歳</div>
     <div style="font-size:13px;font-weight:700;color:var(--pair);margin:10px 0 8px">おくり条件</div>
-    <div class="filter-row"><div class="filter-label">身長</div><input type="number" value="${filters.hkMin||''}" placeholder="以上" oninput="filters.hkMin=+this.value||0"> 〜 <input type="number" value="${filters.hkMax===999?'':filters.hkMax}" placeholder="以下" oninput="filters.hkMax=+this.value||999"> cm</div>
-    <div class="filter-row"><div class="filter-label">年齢</div><input type="number" value="${filters.akMin||''}" placeholder="以上" oninput="filters.akMin=+this.value||0"> 〜 <input type="number" value="${filters.akMax===999?'':filters.akMax}" placeholder="以下" oninput="filters.akMax=+this.value||999"> 歳</div>
+    <div class="filter-row"><div class="filter-label">身長</div><input type="number" value="${filters.hkMin||''}" placeholder="以上" oninput="filters.hkMin=+this.value||0;autoSave()"> 〜 <input type="number" value="${filters.hkMax===999?'':filters.hkMax}" placeholder="以下" oninput="filters.hkMax=+this.value||999;autoSave()"> cm</div>
+    <div class="filter-row"><div class="filter-label">年齢</div><input type="number" value="${filters.akMin||''}" placeholder="以上" oninput="filters.akMin=+this.value||0;autoSave()"> 〜 <input type="number" value="${filters.akMax===999?'':filters.akMax}" placeholder="以下" oninput="filters.akMax=+this.value||999;autoSave()"> 歳</div>
     <button class="btn btn-ghost" style="margin-top:10px" onclick="filters={hoMax:999,hoMin:0,hkMax:999,hkMin:0,aoMax:999,aoMin:0,akMax:999,akMin:0};autoSave();showToast('条件をリセットしました');render()">リセット</button>
   </div>
   <div class="scard"><div class="scard-title">データ管理</div>
@@ -1370,9 +1630,371 @@ function clearAllData(){
   showToast('全データを削除しました');render();
 }
 
-function switchTab(t){cTab=t;['f','m','sh','s'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('active',x===t));render();}
+// ===== 棒交代シミュレーション =====
+let simStep=0, simPlaying=false, simSwitchback=false, simTimer=null;
+let simSpeed=1500;
+
+/**
+ * 配置済みポジション番号を取得（1〜MAX で左or右に人がいる番号）
+ */
+function simFilledPos(sec){
+  const filled=[];
+  for(let i=1;i<=MAX;i++){
+    if(pl[sec+'l'][i]||pl[sec+'r'][i])filled.push(i);
+  }
+  return filled;
+}
+
+/**
+ * 交代順序を生成（正しい棒交代ルール）
+ *
+ * ■ 偶数N（例: 8ポジション）:
+ *   前半[1,2,3,4]・後半[5,6,7,8] をインターリーブ
+ *   おもて通常: 1, 5, 2, 6, 3, 7, 4, 8
+ *   おくり通常: 逆順 → 8, 4, 7, 3, 6, 2, 5, 1
+ *
+ * ■ 奇数N（例: 9ポジション）:
+ *   前半[1,2,3,4]・後半[6,7,8,9]をインターリーブ、中央5番は最後
+ *   おもて通常: 1, 6, 2, 7, 3, 8, 4, 9, 5
+ *   おくり通常: 逆+中央最後 → 9, 4, 8, 3, 7, 2, 6, 1, 5
+ *
+ * 戻り値: { main: [...インターリーブ部], center: 中央番号 or null }
+ */
+function simBuildOrder(sec){
+  const filled=simFilledPos(sec);
+  const N=filled.length;
+  if(N===0)return{main:[],center:null};
+
+  const half=Math.floor(N/2);
+  const isOdd=N%2===1;
+
+  // 奇数: front=[1..half], center=半分+1, back=[半分+2..N]
+  // 偶数: front=[1..half], center=null,   back=[半分+1..N]
+  const front=filled.slice(0,half);
+  let center=null;
+  let back;
+  if(isOdd){
+    center=filled[half];          // 中央ポジション（棒切りの間）
+    back=filled.slice(half+1);
+  }else{
+    back=filled.slice(half);
+  }
+
+  // front と back をインターリーブ（同じ長さ）
+  const main=[];
+  const len=Math.max(front.length,back.length);
+  for(let i=0;i<len;i++){
+    if(i<front.length)main.push(front[i]);
+    if(i<back.length)main.push(back[i]);
+  }
+  return{main,center};
+}
+
+/**
+ * モード（通常/SW）を考慮した最終的な交代順を返す
+ *
+ * おもて通常 / おくりSW後 → main正順 + center
+ * おもてSW後 / おくり通常 → main逆順 + center
+ *
+ * ※ 中央ポジションは常に最後（奇数の場合のみ）
+ */
+function simGetOrder(sec){
+  const{main,center}=simBuildOrder(sec);
+  const shouldReverse=(sec==='o'&&simSwitchback)||(sec==='k'&&!simSwitchback);
+  const order=shouldReverse?[...main].reverse():[...main];
+  if(center!=null)order.push(center);
+  return order;
+}
+
+/**
+ * ポジション→交代順マップを作成 { posNum: stepIndex(0-based) }
+ */
+function simOrderMap(sec){
+  const order=simGetOrder(sec);
+  const map={};
+  order.forEach((pos,i)=>map[pos]=i);
+  return map;
+}
+
+function simMaxSteps(){
+  return Math.max(simGetOrder('o').length,simGetOrder('k').length);
+}
+
+// --- 操作 ---
+
+function simNextStep(){
+  const ms=simMaxSteps();
+  if(ms===0)return;
+  simStep++;
+  if(simStep>=ms)simStep=0;
+  simUpdateDOM();
+}
+
+function simPrevStep(){
+  const ms=simMaxSteps();
+  if(ms===0)return;
+  simStep--;
+  if(simStep<0)simStep=ms-1;
+  simUpdateDOM();
+}
+
+function simTogglePlay(){
+  if(simPlaying){
+    clearInterval(simTimer);simTimer=null;simPlaying=false;
+  }else{
+    simPlaying=true;
+    simTimer=setInterval(simNextStep,simSpeed);
+  }
+  // ボタン表示更新
+  const btn=document.getElementById('sim-play-btn');
+  if(btn){
+    btn.classList.toggle('playing',simPlaying);
+    btn.innerHTML=simPlaying?'⏸ 停止':'▶ 再生';
+  }
+}
+
+function simToggleMode(){
+  simSwitchback=!simSwitchback;
+  simStep=0;
+  if(simPlaying){clearInterval(simTimer);simTimer=null;simPlaying=false;}
+  renderSim();
+}
+
+function simReset(){
+  simStep=0;
+  if(simPlaying){clearInterval(simTimer);simTimer=null;simPlaying=false;}
+  renderSim();
+}
+
+function simSetSpeed(ms){
+  simSpeed=ms;
+  if(simPlaying){
+    clearInterval(simTimer);
+    simTimer=setInterval(simNextStep,simSpeed);
+  }
+  // ボタンのアクティブ状態を更新
+  document.querySelectorAll('.sim-speed-btn').forEach(b=>{
+    const v=+b.dataset.speed;
+    b.className='btn sim-speed-btn '+(v===simSpeed?'btn-primary':'btn-ghost');
+  });
+}
+
+/**
+ * DOM最小更新：ステップ変更時に行のクラスだけ差し替え
+ * フル再描画はしない
+ */
+function simUpdateDOM(){
+  const ms=simMaxSteps();
+  // おもて行の更新
+  const oMap=simOrderMap('o');
+  simFilledPos('o').forEach(pos=>{
+    const el=document.getElementById('sim-o-'+pos);
+    if(!el)return;
+    el.className='sim-row'; // リセット
+    const idx=oMap[pos];
+    if(idx===simStep)el.classList.add('active-o');
+    else if(idx===((simStep+1)%ms)&&ms>1)el.classList.add('next-o');
+    else if(idx<simStep)el.classList.add('done');
+  });
+  // おくり行の更新
+  const kMap=simOrderMap('k');
+  simFilledPos('k').forEach(pos=>{
+    const el=document.getElementById('sim-k-'+pos);
+    if(!el)return;
+    el.className='sim-row';
+    const idx=kMap[pos];
+    if(idx===simStep)el.classList.add('active-k');
+    else if(idx===((simStep+1)%ms)&&ms>1)el.classList.add('next-k');
+    else if(idx<simStep)el.classList.add('done');
+  });
+  // ステータスバー更新
+  const stEl=document.getElementById('sim-step-label');
+  if(stEl)stEl.textContent=(simStep+1)+' / '+ms;
+
+  // 現在交代ポジション情報
+  const infoEl=document.getElementById('sim-current-info');
+  if(infoEl){
+    const oOrder=simGetOrder('o'),kOrder=simGetOrder('k');
+    const oPos=oOrder[simStep],kPos=kOrder[simStep];
+    const parts=[];
+    if(oPos!=null){
+      const nL=byId(pl.ol[oPos]),nR=byId(pl.or[oPos]);
+      const ns=[nL,nR].filter(Boolean).map(m=>m.name).join(' ⇄ ');
+      parts.push('表'+oPos+'番 '+ns);
+    }
+    if(kPos!=null){
+      const nL=byId(pl.kl[kPos]),nR=byId(pl.kr[kPos]);
+      const ns=[nL,nR].filter(Boolean).map(m=>m.name).join(' ⇄ ');
+      parts.push('送'+kPos+'番 '+ns);
+    }
+    infoEl.textContent=parts.join('　｜　');
+  }
+}
+
+/**
+ * シミュレーション画面 — 表形式で完全描画
+ */
+function renderSim(){
+  const oOrder=simGetOrder('o');
+  const kOrder=simGetOrder('k');
+  const oMap=simOrderMap('o');
+  const kMap=simOrderMap('k');
+  const ms=simMaxSteps();
+  const oBk=calcBokiri('o'),kBk=calcBokiri('k');
+
+  /**
+   * セクションの行HTMLを生成
+   * sec: 'o' or 'k'
+   * positions: 表示順のポジション番号配列
+   * colorSuffix: 'o' or 'k'
+   * orderMap: { pos: stepIndex }
+   * bk: 棒切り情報
+   */
+  function buildRows(sec,positions,colorSuffix,orderMap,bk){
+    let html='';
+    positions.forEach(pos=>{
+      const mL=byId(pl[sec+'l'][pos]);
+      const mR=byId(pl[sec+'r'][pos]);
+      const idx=orderMap[pos];
+      const isEmpty=!mL&&!mR;
+
+      // 行の状態クラス
+      let cls='sim-row';
+      if(!isEmpty){
+        if(idx===simStep)cls+=' active-'+colorSuffix;
+        else if(idx===((simStep+1)%ms)&&ms>1)cls+=' next-'+colorSuffix;
+        else if(idx<simStep)cls+=' done';
+      }
+
+      // 交代順バッジ
+      const ordLabel=isEmpty?'':String(idx+1);
+
+      // メンバー名
+      const nameL=mL?sn(mL.name):'-';
+      const nameR=mR?sn(mR.name):'-';
+      const subL=mL?mL.height+'cm':'';
+      const subR=mR?mR.height+'cm':'';
+
+      html+=`<div class="${cls}" id="sim-${sec}-${pos}">
+        <div class="sim-rnum">${pos}</div>
+        <div class="sim-ord">${isEmpty?'':'<div class="sim-ord-badge">'+ordLabel+'</div>'}</div>
+        <div class="sim-member sim-member-l${mL?'':' empty-m'}"><div>${nameL}</div>${subL?'<div style="font-size:9px;color:var(--text-tertiary);font-weight:400">'+subL+'</div>':''}</div>
+        <div class="sim-swap-col">⇄</div>
+        <div class="sim-member sim-member-r${mR?'':' empty-m'}"><div>${nameR}</div>${subR?'<div style="font-size:9px;color:var(--text-tertiary);font-weight:400">'+subR+'</div>':''}</div>
+      </div>`;
+
+      // 棒切りライン
+      if(bk.N>=6){
+        if(bk.normal===pos){
+          html+='<div class="sim-bokiri"><div class="sim-bokiri-label">棒切り</div></div>';
+        }
+        if(bk.sw===pos){
+          html+='<div class="sim-bokiri sim-bokiri-sw"><div class="sim-bokiri-label">SW後棒切り</div></div>';
+        }
+      }
+    });
+    return html;
+  }
+
+  // 現在の交代情報テキスト
+  let currentInfo='';
+  if(ms>0){
+    const oPos=oOrder[simStep],kPos=kOrder[simStep];
+    const parts=[];
+    if(oPos!=null){
+      const nL=byId(pl.ol[oPos]),nR=byId(pl.or[oPos]);
+      const ns=[nL,nR].filter(Boolean).map(m=>m.name).join(' ⇄ ');
+      parts.push('表'+oPos+'番 '+ns);
+    }
+    if(kPos!=null){
+      const nL=byId(pl.kl[kPos]),nR=byId(pl.kr[kPos]);
+      const ns=[nL,nR].filter(Boolean).map(m=>m.name).join(' ⇄ ');
+      parts.push('送'+kPos+'番 '+ns);
+    }
+    currentInfo=parts.join('　｜　');
+  }
+
+  // おもて・おくりの表示用ポジション配列
+  const oPositions=simFilledPos('o');                            // 1,2,...,N 昇順
+  const kPositions=[...simFilledPos('k')].reverse();             // N,...,2,1 降順
+
+  let h='<div class="sim-wrap">';
+
+  // ステータスバー
+  h+=`<div class="sim-status">
+    <div style="margin-bottom:4px">
+      <span style="display:inline-block;padding:3px 10px;border-radius:980px;font-size:11px;font-weight:700;
+        ${simSwitchback?'background:rgba(107,53,201,0.12);color:#6b35c9':'background:rgba(0,113,227,0.1);color:var(--accent)'}">
+        ${simSwitchback?'🔄 スイッチバック':'📐 通常モード'}
+      </span>
+    </div>
+    <div>ステップ <span class="step-num-label" id="sim-step-label">${ms>0?(simStep+1)+' / '+ms:'—'}</span></div>
+    <div id="sim-current-info" style="margin-top:4px;font-size:12px;color:var(--text-primary);font-weight:700;min-height:1.4em">${currentInfo}</div>
+  </div>`;
+
+  // 速度調整
+  h+=`<div class="sim-speed-bar">
+    <button class="btn sim-speed-btn ${simSpeed===2500?'btn-primary':'btn-ghost'}" data-speed="2500" style="font-size:10px;padding:4px 10px" onclick="simSetSpeed(2500)">遅い</button>
+    <button class="btn sim-speed-btn ${simSpeed===1500?'btn-primary':'btn-ghost'}" data-speed="1500" style="font-size:10px;padding:4px 10px" onclick="simSetSpeed(1500)">普通</button>
+    <button class="btn sim-speed-btn ${simSpeed===800?'btn-primary':'btn-ghost'}" data-speed="800" style="font-size:10px;padding:4px 10px" onclick="simSetSpeed(800)">速い</button>
+  </div>`;
+
+  // === おもてテーブル ===
+  h+=`<div class="sim-table">
+    <div class="sim-sec-head" style="color:var(--accent)">↑ おもて</div>
+    <div class="sim-col-head">
+      <span class="sim-ch-num">#</span>
+      <span class="sim-ch-ord">順</span>
+      <span class="sim-ch-name">左</span>
+      <span class="sim-ch-swap">⇄</span>
+      <span class="sim-ch-name">右</span>
+    </div>
+    ${oPositions.length?buildRows('o',oPositions,'o',oMap,oBk):'<div style="text-align:center;padding:16px;font-size:12px;color:var(--text-tertiary)">配置なし</div>'}
+  </div>`;
+
+  // 山笠
+  h+=`<div class="sim-yamagasa">山　笠</div>`;
+
+  // === おくりテーブル ===
+  h+=`<div class="sim-table">
+    <div class="sim-sec-head" style="color:var(--pair)">おくり ↑</div>
+    <div class="sim-col-head">
+      <span class="sim-ch-num">#</span>
+      <span class="sim-ch-ord">順</span>
+      <span class="sim-ch-name">左</span>
+      <span class="sim-ch-swap">⇄</span>
+      <span class="sim-ch-name">右</span>
+    </div>
+    ${kPositions.length?buildRows('k',kPositions,'k',kMap,kBk):'<div style="text-align:center;padding:16px;font-size:12px;color:var(--text-tertiary)">配置なし</div>'}
+  </div>`;
+
+  h+=`</div>`;
+
+  // 操作ボタン（sticky bottom）
+  h+=`<div class="sim-controls">
+    <button class="sim-btn sim-btn-reset" onclick="simReset()">⏮ 最初</button>
+    <button class="sim-btn sim-btn-next" onclick="simPrevStep()">◀ 戻る</button>
+    <button class="sim-btn sim-btn-next" onclick="simNextStep()">次へ ▶</button>
+    <button class="sim-btn sim-btn-play ${simPlaying?'playing':''}" id="sim-play-btn" onclick="simTogglePlay()">${simPlaying?'⏸ 停止':'▶ 再生'}</button>
+    <button class="sim-btn sim-btn-mode ${simSwitchback?'sw':''}" onclick="simToggleMode()">${simSwitchback?'🔄 SW':'📐 通常'}</button>
+  </div>`;
+
+  document.getElementById('main').innerHTML=h;
+}
+
+function switchTab(t){
+  // シミュレーションタブから離れる時は再生停止
+  if(cTab==='sim'&&t!=='sim'){
+    if(simPlaying){clearInterval(simTimer);simTimer=null;simPlaying=false;}
+  }
+  // シミュレーションタブに入る時はステップリセット
+  if(t==='sim'&&cTab!=='sim'){simStep=0;simPlaying=false;}
+  cTab=t;
+  ['f','m','sim','sh','s'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('active',x===t));
+  render();
+}
 function switchDay(d){cDay=d;[0,1,2].forEach(i=>document.getElementById('day-'+i).classList.toggle('active',i===d));autoSave();render();}
-function render(){if(cTab==='m')renderM();else if(cTab==='sh')renderShare();else if(cTab==='s')renderS();else renderF();}
+function render(){if(cTab==='m')renderM();else if(cTab==='sim')renderSim();else if(cTab==='sh')renderShare();else if(cTab==='s')renderS();else renderF();}
 
 // ===== 起動 =====
 (function(){
